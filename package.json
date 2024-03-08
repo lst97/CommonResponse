@@ -1,6 +1,6 @@
 {
   "name": "@lst97/common_response",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "This is a DEVELOPMENT package, not for production use. A common response structure for all the API's. Included basic error handling.",
   "main": "index.js",
   "types": "lib/index.d.ts",

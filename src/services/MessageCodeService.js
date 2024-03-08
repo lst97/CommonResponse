@@ -79,7 +79,7 @@ let MessageCodeService = (() => {
     let _classThis;
     var MessageCodeService = _classThis = class {
         constructor() {
-            const data = fs.readFileSync('src/models/share/api/MessageCodes.json', 'utf8');
+            const data = fs.readFileSync("src/models/MessageCodes.json", "utf8");
             this.Messages = JSON.parse(data);
         }
         getResponseMessageByCode(code) {
