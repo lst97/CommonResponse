@@ -1,67 +1,87 @@
-import { Service } from 'typedi';
-import { createLogger, transports, format } from 'winston';
-import { consoleColorCodes } from '../constants/Colors';
+import pino from "pino";
+import { Service } from "typedi";
 
 @Service()
-class LogService {
-	private logger: any;
+export class LogService {
+  public logger: any;
+  private serviceName: string;
 
-	constructor() {
-		this.init();
-	}
+  constructor(logger?: any) {
+    // If logger is provided, use it
+    if (logger) {
+      this.logger = logger;
+    } else {
+      // Pino pretty configuration: https://getpino.io/#/docs/pretty
+      this.logger = pino({
+        level: process.env.LOG_LEVEL || "info",
+        formatters: {
+          level: (label) => {
+            return { level: label };
+          },
+        },
+        transport: {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+            translateTime: "SYS:dd-mm-yyyy HH:MM:ss o",
+          },
+        },
+      });
 
-	public init() {
-		this.logger = createLogger({
-			transports: [new transports.Console()],
-			format: format.combine(
-				format.colorize(),
-				format.timestamp(),
-				format.printf(({ timestamp, level, message, service }) => {
-					service =
-						consoleColorCodes.blue +
-						service +
-						consoleColorCodes.reset;
-					timestamp =
-						consoleColorCodes.gray +
-						timestamp +
-						consoleColorCodes.reset;
-					return `[${timestamp}] ${service} ${level}: ${message}`;
-				})
-			)
-		});
-	}
+      if (this.logger === undefined) {
+        throw new Error("Logger not created");
+      }
+    }
 
-	public setServiceName(service: string) {
-		if (service && service.trim() !== '') {
-			this.logger.defaultMeta = { service: service };
-		} else {
-			throw new Error('Invalid service name');
-		}
-	}
+    this.serviceName = "default";
+  }
 
-	public error(message: string) {
-		if (message && message.trim() !== '') {
-			this.logger.error(message);
-		}
-	}
+  private getLogger() {
+    return pino({
+      level: process.env.LOG_LEVEL || "info",
+      formatters: {
+        level: (label) => {
+          return { level: label };
+        },
+      },
+      transport: {
+        target: "pino-pretty",
+        options: {
+          colorize: true,
+          translateTime: "SYS:dd-mm-yyyy HH:MM:ss o",
+        },
+      },
+    });
+  }
+  public setServiceName(service: string): void {
+    if (service && service.trim() !== "") {
+      this.serviceName = service;
+    } else {
+      throw new Error("Invalid service name");
+    }
+  }
 
-	public info(message: string) {
-		if (message && message.trim() !== '') {
-			this.logger.info(message);
-		}
-	}
+  public error(message: string): void {
+    if (message && message.trim() !== "") {
+      this.logger.error({ service: this.serviceName }, message);
+    }
+  }
 
-	public warn(message: string) {
-		if (message && message.trim() !== '') {
-			this.logger.warn(message);
-		}
-	}
+  public info(message: string): void {
+    if (message && message.trim() !== "") {
+      this.logger.info({ service: this.serviceName }, message);
+    }
+  }
 
-	public debug(message: string) {
-		if (message && message.trim() !== '') {
-			this.logger.debug(message);
-		}
-	}
+  public warn(message: string): void {
+    if (message && message.trim() !== "") {
+      this.logger.warn({ service: this.serviceName }, message);
+    }
+  }
+
+  public debug(message: string): void {
+    if (message && message.trim() !== "") {
+      this.logger.debug({ service: this.serviceName }, message);
+    }
+  }
 }
-
-export default LogService;

@@ -1,21 +1,25 @@
 import { Response } from "express";
-import { Service } from "typedi";
-import BackendStandardResponse, { ResponseMessage } from "../models/Response";
-import ErrorHandlerService from "../services/ErrorHandlerService";
+import { BackendStandardResponse, ResponseMessage } from "../models/Response";
+import { ErrorHandlerService } from "../services/ErrorHandlerService";
 import { MessageCodeService } from "./MessageCodeService";
-import DefinedBaseError, {
+import {
+  DefinedBaseError,
   DatabaseError,
   ServerError,
   SqlRecordExistsError,
   SqlRecordNotFoundError,
 } from "../models/Errors";
+import { Service } from "typedi";
 
 @Service()
-class ResponseService {
-  constructor(
-    private errorHandlerService: ErrorHandlerService,
-    private messageCodeService: MessageCodeService
-  ) {}
+export class ResponseService {
+  private errorHandlerService: ErrorHandlerService;
+  private messageCodeService: MessageCodeService;
+
+  constructor() {
+    this.errorHandlerService = new ErrorHandlerService();
+    this.messageCodeService = new MessageCodeService();
+  }
   /**
    * Sends an error response to the client.
    * @param res - The Express response object.
@@ -28,7 +32,7 @@ class ResponseService {
     res: Response,
     error: Error,
     requestId: string,
-    httpStatus: number = 500
+    httpStatus: number = 500,
   ): Response<any, Record<string, any>> {
     let message: ResponseMessage | null = null;
     let traceId = "";
@@ -40,12 +44,12 @@ class ResponseService {
       });
     } else {
       const rootCause = this.errorHandlerService.getDefinedBaseError(
-        error.traceId
+        error.traceId,
       )!;
 
       message = new ResponseMessage(
         rootCause.messageCode,
-        rootCause.userMessage
+        rootCause.userMessage,
       );
 
       traceId = rootCause.traceId;
@@ -64,7 +68,7 @@ class ResponseService {
     ) {
       message = new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationFail.Code,
-        this.messageCodeService.Messages.Common.OperationFail.Message
+        this.messageCodeService.Messages.Common.OperationFail.Message,
       );
     }
 
@@ -90,13 +94,13 @@ class ResponseService {
     res: Response,
     data: any,
     requestId: string,
-    status: number = 200
+    status: number = 200,
   ): Response<any, Record<string, any>> {
     const response = new BackendStandardResponse({
       status: "success",
       message: new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationSuccess.Code,
-        this.messageCodeService.Messages.Common.OperationSuccess.Message
+        this.messageCodeService.Messages.Common.OperationSuccess.Message,
       ),
       data,
       requestId,
@@ -105,5 +109,3 @@ class ResponseService {
     return res.status(status).json(response);
   }
 }
-
-export default ResponseService;

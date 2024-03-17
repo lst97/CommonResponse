@@ -66,7 +66,7 @@ interface UnknownErrorParams {
   cause?: Error;
 }
 
-class DefinedBaseError extends Error {
+export class DefinedBaseError extends Error {
   httpStatus: number;
   userMessage: string;
   messageCode: string;
@@ -77,7 +77,7 @@ class DefinedBaseError extends Error {
     message: string,
     httpStatus: number,
     messageCode: string,
-    userMessage?: string
+    userMessage?: string,
   ) {
     super(message);
     this.httpStatus = httpStatus;
@@ -107,7 +107,7 @@ export class ExportError extends DefinedBaseError {
     super(
       message || responseMessage?.Message || defaultMessage.Message,
       responseMessage?.StatusCode || defaultMessage.StatusCode,
-      messageCode || defaultMessage.Code
+      messageCode || defaultMessage.Code,
     );
 
     if (this.cause === undefined) {
@@ -141,7 +141,7 @@ export class ServerError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code
+      messageCode ?? defaultFailedOperation.Code,
     );
 
     if (this.cause === undefined) {
@@ -170,7 +170,7 @@ export class ServerResourceNotFoundError extends DefinedBaseError {
     super(
       message || defaultMessage.Message,
       defaultMessage.StatusCode,
-      defaultMessage.Code
+      defaultMessage.Code,
     );
   }
 }
@@ -187,7 +187,7 @@ export class ValidationError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultMessage.Message,
       responseMessage?.StatusCode ?? defaultMessage.StatusCode,
-      messageCode ?? defaultMessage.Code
+      messageCode ?? defaultMessage.Code,
     );
 
     if (this.cause === undefined) {
@@ -254,7 +254,7 @@ export class ClientAuthError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultMessage.Message,
       responseMessage?.StatusCode ?? defaultMessage.StatusCode,
-      messageCode ?? defaultMessage.Code
+      messageCode ?? defaultMessage.Code,
     );
 
     if (cause === undefined) {
@@ -399,7 +399,7 @@ export class ServiceError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code
+      messageCode ?? defaultFailedOperation.Code,
     );
 
     if (this.cause === undefined) {
@@ -417,7 +417,7 @@ export class ControllerError extends DefinedBaseError {
     super(
       message || defaultMessage.Message,
       defaultMessage.StatusCode,
-      defaultMessage.Code
+      defaultMessage.Code,
     );
   }
 }
@@ -438,7 +438,7 @@ export class DatabaseError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code
+      messageCode ?? defaultFailedOperation.Code,
     );
 
     this.query = query;
@@ -462,7 +462,7 @@ export class PartialError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code
+      messageCode ?? defaultFailedOperation.Code,
     );
 
     if (this.cause === undefined) {
@@ -564,5 +564,3 @@ export class SqlRecordExistsError extends DatabaseError {
     this.query = query;
   }
 }
-
-export default DefinedBaseError;
