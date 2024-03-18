@@ -11,8 +11,11 @@ describe("ErrorHandlerService", () => {
   let errorHandlerService: ErrorHandlerService;
   beforeEach(() => {
     Container.set(LogService, new LogService());
-    Container.set(MessageCodeService, new MessageCodeService());
-    errorHandlerService = new ErrorHandlerService();
+    Container.set(
+      MessageCodeService,
+      new MessageCodeService(Container.get(LogService)),
+    );
+    errorHandlerService = new ErrorHandlerService(Container.get(LogService));
   });
 
   afterEach(() => {
@@ -29,7 +32,7 @@ describe("ErrorHandlerService", () => {
 
     // Assert
     expect(errorHandlerService.getDefinedBaseError(error.traceId)).toEqual(
-      error
+      error,
     );
   });
 
@@ -40,13 +43,13 @@ describe("ErrorHandlerService", () => {
     const error_bummock = new DefinedBaseError(
       "Example error [1]",
       500,
-      "EXAMPLE_ERROR [1]"
+      "EXAMPLE_ERROR [1]",
     );
     error_bummock.cause = causeError;
     const error_hummock = new DefinedBaseError(
       "Example error [2]",
       500,
-      "EXAMPLE_ERROR [2]"
+      "EXAMPLE_ERROR [2]",
     );
     error_hummock.cause = error_bummock;
 
@@ -57,10 +60,10 @@ describe("ErrorHandlerService", () => {
 
     // Assert
     expect(
-      errorHandlerService.getDefinedBaseError(error_hummock.traceId)?.cause
+      errorHandlerService.getDefinedBaseError(error_hummock.traceId)?.cause,
     ).toEqual(error_bummock);
     expect(errorHandlerService.getRootCause(error_hummock.traceId)).toEqual(
-      causeError
+      causeError,
     );
   });
 

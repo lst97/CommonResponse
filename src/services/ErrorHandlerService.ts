@@ -1,4 +1,4 @@
-import Container, { Service } from "typedi";
+import { Service } from "typedi";
 import {
   DefinedBaseError,
   ClientAuthError,
@@ -162,15 +162,16 @@ export class TestErrorLogStrategy implements LogStrategy {
 export class ErrorHandlerService {
   private errorChains: Map<string, DefinedBaseError> = new Map();
   private onErrorCallback?: (error: DefinedBaseError) => void;
-  private logger: LogService;
 
   /**
    * Constructs an instance of ErrorHandlerService.
    * @param {function} onErrorCallback - The callback function to be called when an error occurs.
    */
-  constructor(onErrorCallback?: (error: DefinedBaseError) => void) {
+  constructor(
+    private logger: LogService,
+    onErrorCallback?: (error: DefinedBaseError) => void,
+  ) {
     this.onErrorCallback = onErrorCallback;
-    this.logger = Container.get(LogService);
   }
 
   public removeErrorFromChain(traceId: string): void {

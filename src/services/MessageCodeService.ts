@@ -1,5 +1,5 @@
 import * as fs from "fs";
-import Container, { Service } from "typedi";
+import { Service } from "typedi";
 import { LogService } from "./LogService";
 
 interface ResponseMessages {
@@ -23,12 +23,13 @@ export class ResponseMessage {
 @Service()
 export class MessageCodeService {
   public readonly Messages: ResponseMessages;
-  private readonly logService;
   private readonly defaultMessagesPath: string;
 
-  constructor(path?: string) {
+  constructor(
+    private logService: LogService,
+    path?: string,
+  ) {
     this.defaultMessagesPath = path || "src/models/MessageCodes.json";
-    this.logService = Container.get(LogService);
     this.logService.setServiceName(MessageCodeService.name);
 
     try {
@@ -44,7 +45,7 @@ export class MessageCodeService {
         try {
           const data = fs.readFileSync(
             "node_modules/@lst97/common_response/lib/cjs/src/models/MessageCodes.json",
-            "utf8"
+            "utf8",
           );
 
           this.Messages = JSON.parse(data);

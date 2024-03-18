@@ -1,6 +1,6 @@
 {
   "name": "@lst97/common_response",
-  "version": "0.1.0-alpha.25",
+  "version": "0.1.0-alpha.26",
   "description": "This is a DEVELOPMENT package, not for production use. A common response structure for all the API's. Included basic error handling.",
   "main": "lib/cjs/index.js",
   "types": "lib/esm/index.d.ts",

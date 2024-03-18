@@ -27,7 +27,7 @@ interface CommonResponse {
 export class ResponseService {
   constructor(
     private errorHandlerService: ErrorHandlerService,
-    private messageCodeService: MessageCodeService
+    private messageCodeService: MessageCodeService,
   ) {}
 
   /**
@@ -46,7 +46,7 @@ export class ResponseService {
   public buildErrorResponse(
     error: Error,
     requestId: string,
-    httpStatus: number = 500
+    httpStatus: number = 500,
   ): CommonResponse {
     let message: ResponseMessage | null = null;
     let traceId = "";
@@ -58,13 +58,13 @@ export class ResponseService {
       });
     } else {
       const rootCause = this.errorHandlerService.getDefinedBaseError(
-        error.traceId
+        error.traceId,
       )!;
 
       if (rootCause != null) {
         message = new ResponseMessage(
           rootCause.messageCode,
-          rootCause.userMessage
+          rootCause.userMessage,
         );
 
         traceId = rootCause.traceId;
@@ -88,7 +88,7 @@ export class ResponseService {
     ) {
       message = new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationFail.Code,
-        this.messageCodeService.Messages.Common.OperationFail.Message
+        this.messageCodeService.Messages.Common.OperationFail.Message,
       );
     }
 
@@ -113,13 +113,13 @@ export class ResponseService {
   public buildSuccessResponse(
     data: any,
     requestId: string,
-    httpStatus: number = 200
+    httpStatus: number = 200,
   ): CommonResponse {
     const response = new BackendStandardResponse({
       status: "success",
       message: new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationSuccess.Code,
-        this.messageCodeService.Messages.Common.OperationSuccess.Message
+        this.messageCodeService.Messages.Common.OperationSuccess.Message,
       ),
       data,
       requestId,

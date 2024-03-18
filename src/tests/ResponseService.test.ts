@@ -11,12 +11,18 @@ describe("ResponseService", () => {
 
   beforeEach(() => {
     Container.set(LogService, new LogService());
-    Container.set(MessageCodeService, new MessageCodeService());
-    Container.set(ErrorHandlerService, new ErrorHandlerService());
+    Container.set(
+      MessageCodeService,
+      new MessageCodeService(Container.get(LogService)),
+    );
+    Container.set(
+      ErrorHandlerService,
+      new ErrorHandlerService(Container.get(LogService)),
+    );
 
     responseService = new ResponseService(
       Container.get(ErrorHandlerService),
-      Container.get(MessageCodeService)
+      Container.get(MessageCodeService),
     );
   });
 
@@ -27,7 +33,7 @@ describe("ResponseService", () => {
   it("should return an error response object with status 'error' and a message object when given an error object and a request ID", () => {
     const responseService = new ResponseService(
       Container.get(ErrorHandlerService),
-      Container.get(MessageCodeService)
+      Container.get(MessageCodeService),
     );
 
     const error = new ServerError({
@@ -42,7 +48,7 @@ describe("ResponseService", () => {
     const response = responseService.buildErrorResponse(
       error,
       requestId,
-      httpStatus
+      httpStatus,
     );
 
     expect(response).toEqual({

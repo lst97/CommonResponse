@@ -10,7 +10,7 @@ describe("MessageCodeService", () => {
 
   beforeEach(() => {
     Container.set(LogService, new LogService());
-    messageCodeService = new MessageCodeService();
+    messageCodeService = new MessageCodeService(Container.get(LogService));
   });
 
   afterEach(() => {
@@ -49,16 +49,19 @@ describe("MessageCodeService", () => {
     const code = "DUPLICATION_TEST";
 
     expect(messageCodeService.getResponseMessageByCode(code)).toThrow(
-      "Multiple response messages found for code: DUPLICATION_TEST"
+      "Multiple response messages found for code: DUPLICATION_TEST",
     );
   });
 
   it("should handle MessageCodes.json not found", () => {
     const path = "invalid_path";
-    const messageCodeService = new MessageCodeService(path);
+    const messageCodeService = new MessageCodeService(
+      Container.get(LogService),
+      path,
+    );
 
     expect(messageCodeService.Messages).toThrow(
-      "Error loading default message codes file"
+      "Error loading default message codes file",
     );
   });
 });
