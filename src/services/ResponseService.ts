@@ -1,4 +1,3 @@
-import { Response } from "express";
 import { BackendStandardResponse, ResponseMessage } from "../models/Response";
 import { ErrorHandlerService } from "../services/ErrorHandlerService";
 import { MessageCodeService } from "./MessageCodeService";
@@ -11,29 +10,44 @@ import {
 } from "../models/Errors";
 import { Service } from "typedi";
 
+/**
+ * Represents a common response object.
+ * @template T - The type of the `response` property, type should be same as data.
+ */
+interface CommonResponse {
+  httpStatus: number;
+  response: BackendStandardResponse<any>;
+}
+
+/**
+ * The ResponseService class is responsible for building response objects based on provided errors,
+ * request IDs, and HTTP statuses. It handles both known and unknown errors, constructs response messages, and creates instances of the BackendStandardResponse class.
+ */
 @Service()
 export class ResponseService {
-  private errorHandlerService: ErrorHandlerService;
-  private messageCodeService: MessageCodeService;
+  constructor(
+    private errorHandlerService: ErrorHandlerService,
+    private messageCodeService: MessageCodeService
+  ) {}
 
-  constructor() {
-    this.errorHandlerService = new ErrorHandlerService();
-    this.messageCodeService = new MessageCodeService();
-  }
   /**
-   * Sends an error response to the client.
-   * @param res - The Express response object.
-   * @param error - The error object that occurred.
-   * @param requestId - A unique identifier for the request.
-   * @param httpStatus - The HTTP status code for the response. Defaults to 500 if not provided.
-   * @returns The Express response object with the error response sent to the client.
+   * Builds an error response based on the provided error, request ID, and HTTP status.
+   * If the error is an instance of DefinedBaseError, it retrieves the root cause error
+   * and constructs a response message based on it. Otherwise, it handles the unknown error.
+   * If the error is an instance of ServerError or DatabaseError (excluding SqlRecordNotFoundError
+   * and SqlRecordExistsError), or if no message is available, a default error message is used.
+   * The response includes the status, message, request ID, and trace ID.
+   *
+   * @param error - The error object.
+   * @param requestId - The ID of the request.
+   * @param httpStatus - The HTTP status code (default: 500).
+   * @returns The built CommonResponse object containing the HTTP status and response.
    */
-  public sendError(
-    res: Response,
+  public buildErrorResponse(
     error: Error,
     requestId: string,
-    httpStatus: number = 500,
-  ): Response<any, Record<string, any>> {
+    httpStatus: number = 500
+  ): CommonResponse {
     let message: ResponseMessage | null = null;
     let traceId = "";
 
@@ -44,15 +58,21 @@ export class ResponseService {
       });
     } else {
       const rootCause = this.errorHandlerService.getDefinedBaseError(
-        error.traceId,
+        error.traceId
       )!;
 
-      message = new ResponseMessage(
-        rootCause.messageCode,
-        rootCause.userMessage,
-      );
+      if (rootCause != null) {
+        message = new ResponseMessage(
+          rootCause.messageCode,
+          rootCause.userMessage
+        );
 
-      traceId = rootCause.traceId;
+        traceId = rootCause.traceId;
+      } else {
+        message = new ResponseMessage(error.messageCode, error.userMessage);
+
+        traceId = error.traceId;
+      }
 
       httpStatus = error.httpStatus;
     }
@@ -68,7 +88,7 @@ export class ResponseService {
     ) {
       message = new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationFail.Code,
-        this.messageCodeService.Messages.Common.OperationFail.Message,
+        this.messageCodeService.Messages.Common.OperationFail.Message
       );
     }
 
@@ -79,33 +99,32 @@ export class ResponseService {
       traceId,
     });
 
-    return res.status(httpStatus).json(response);
+    this.errorHandlerService.removeErrorFromChain(traceId);
+    return { httpStatus: httpStatus, response: response };
   }
 
   /**
-   * Sends a successful response to the client with the provided data.
-   * @param res - The Express response object.
-   * @param data - The data to be sent in the response.
-   * @param requestId - A unique identifier for the request.
-   * @param status - The HTTP status code for the response. (default: 200)
-   * @returns The Express response object with the successful response sent to the client.
+   * Builds a success response object.
+   * @param data - The data to be included in the response.
+   * @param requestId - The unique identifier for the request.
+   * @param httpStatus - The HTTP status code for the response (default: 200).
+   * @returns The built success response object.
    */
-  public sendSuccess(
-    res: Response,
+  public buildSuccessResponse(
     data: any,
     requestId: string,
-    status: number = 200,
-  ): Response<any, Record<string, any>> {
+    httpStatus: number = 200
+  ): CommonResponse {
     const response = new BackendStandardResponse({
       status: "success",
       message: new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationSuccess.Code,
-        this.messageCodeService.Messages.Common.OperationSuccess.Message,
+        this.messageCodeService.Messages.Common.OperationSuccess.Message
       ),
       data,
       requestId,
     });
 
-    return res.status(status).json(response);
+    return { httpStatus: httpStatus, response: response };
   }
 }

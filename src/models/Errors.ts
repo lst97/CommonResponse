@@ -2,6 +2,12 @@ import Container from "typedi";
 import { MessageCodeService } from "../services/MessageCodeService";
 import { v4 as uuidv4 } from "uuid";
 
+interface TestErrorParams {
+  message?: string;
+  messageCode?: string;
+  cause?: Error;
+  test: string;
+}
 interface SqlErrorParams {
   message?: string;
   query?: string;
@@ -77,13 +83,33 @@ export class DefinedBaseError extends Error {
     message: string,
     httpStatus: number,
     messageCode: string,
-    userMessage?: string,
+    userMessage?: string
   ) {
     super(message);
     this.httpStatus = httpStatus;
     this.userMessage = userMessage || message;
     this.messageCode = messageCode;
     this.traceId = `stzita.traceId.${uuidv4()}`;
+  }
+}
+
+/**
+ * Represents an error designed STRICTLY for internal test use.
+ * Do not use outside of testing environments. Because this class does not have any meaning.
+ *
+ * @internal
+ * @test
+ */
+export class TestError extends DefinedBaseError {
+  test: string;
+  constructor({ message, messageCode, cause, test }: TestErrorParams) {
+    super(message || `Test error: ${test}`, 500, messageCode || "TEST");
+
+    this.test = test;
+
+    if (this.cause === undefined) {
+      this.cause = cause;
+    }
   }
 }
 
@@ -107,7 +133,7 @@ export class ExportError extends DefinedBaseError {
     super(
       message || responseMessage?.Message || defaultMessage.Message,
       responseMessage?.StatusCode || defaultMessage.StatusCode,
-      messageCode || defaultMessage.Code,
+      messageCode || defaultMessage.Code
     );
 
     if (this.cause === undefined) {
@@ -141,7 +167,7 @@ export class ServerError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code,
+      messageCode ?? defaultFailedOperation.Code
     );
 
     if (this.cause === undefined) {
@@ -170,7 +196,7 @@ export class ServerResourceNotFoundError extends DefinedBaseError {
     super(
       message || defaultMessage.Message,
       defaultMessage.StatusCode,
-      defaultMessage.Code,
+      defaultMessage.Code
     );
   }
 }
@@ -187,7 +213,7 @@ export class ValidationError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultMessage.Message,
       responseMessage?.StatusCode ?? defaultMessage.StatusCode,
-      messageCode ?? defaultMessage.Code,
+      messageCode ?? defaultMessage.Code
     );
 
     if (this.cause === undefined) {
@@ -254,7 +280,7 @@ export class ClientAuthError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultMessage.Message,
       responseMessage?.StatusCode ?? defaultMessage.StatusCode,
-      messageCode ?? defaultMessage.Code,
+      messageCode ?? defaultMessage.Code
     );
 
     if (cause === undefined) {
@@ -399,7 +425,7 @@ export class ServiceError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code,
+      messageCode ?? defaultFailedOperation.Code
     );
 
     if (this.cause === undefined) {
@@ -417,7 +443,7 @@ export class ControllerError extends DefinedBaseError {
     super(
       message || defaultMessage.Message,
       defaultMessage.StatusCode,
-      defaultMessage.Code,
+      defaultMessage.Code
     );
   }
 }
@@ -438,7 +464,7 @@ export class DatabaseError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code,
+      messageCode ?? defaultFailedOperation.Code
     );
 
     this.query = query;
@@ -462,7 +488,7 @@ export class PartialError extends DefinedBaseError {
     super(
       message ?? responseMessage?.Message ?? defaultFailedOperation.Message,
       responseMessage?.StatusCode ?? defaultFailedOperation.StatusCode,
-      messageCode ?? defaultFailedOperation.Code,
+      messageCode ?? defaultFailedOperation.Code
     );
 
     if (this.cause === undefined) {

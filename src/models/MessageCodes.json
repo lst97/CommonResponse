@@ -150,5 +150,22 @@
       "Message": "Failed to export the data as xlsx",
       "StatusCode": 500
     }
+  },
+  "TEST": {
+    "TEST": {
+      "Code": "TEST",
+      "Message": "TEST",
+      "StatusCode": 200
+    },
+    "DUPLICATION_TEST": {
+      "Code": "DUPLICATION_TEST",
+      "Message": "DUPLICATION_TEST",
+      "StatusCode": 200
+    },
+    "DUPLICATION_TEST": {
+      "Code": "DUPLICATION_TEST",
+      "Message": "DUPLICATION_TEST",
+      "StatusCode": 200
+    }
   }
 }

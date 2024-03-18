@@ -14,7 +14,6 @@ jest.mock("pino", () => {
 });
 
 describe("LogService", () => {
-  let logger: any;
   let logService: LogService;
 
   beforeEach(() => {
@@ -27,7 +26,6 @@ describe("LogService", () => {
 
   it("should create a logger", () => {
     expect(logService).toBeDefined();
-    console.log(logService);
   });
 
   // it("should set the service name", () => {
