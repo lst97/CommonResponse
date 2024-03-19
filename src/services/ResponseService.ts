@@ -9,6 +9,10 @@ import {
   SqlRecordNotFoundError,
 } from "../models/Errors";
 
+/**
+ * The ResponseService class is responsible for building response objects based on provided errors,
+ * request IDs, and HTTP statuses. It handles both known and unknown errors, constructs response messages, and creates instances of the BackendStandardResponse class.
+ */
 export interface IResponseService {
   /**
    * Builds an error response based on the provided error, request ID, and HTTP status.

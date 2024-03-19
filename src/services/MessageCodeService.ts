@@ -64,7 +64,10 @@ export class MessageCodeService {
   }
   private readonly defaultMessagesPath: string;
 
-  constructor(private logService: ILogService, path?: string) {
+  constructor(
+    private logService: ILogService,
+    path?: string,
+  ) {
     this.defaultMessagesPath = path || "src/models/MessageCodes.json";
     this.logService.setServiceName(MessageCodeService.name);
 
@@ -81,7 +84,7 @@ export class MessageCodeService {
         try {
           const data = fs.readFileSync(
             "node_modules/@lst97/common_response/lib/cjs/src/models/MessageCodes.json",
-            "utf8"
+            "utf8",
           );
 
           this.message = JSON.parse(data);

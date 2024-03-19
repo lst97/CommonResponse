@@ -196,7 +196,7 @@ export class ErrorHandlerService {
    */
   constructor(
     private logger: LogService,
-    onErrorCallback?: (error: DefinedBaseError) => void
+    onErrorCallback?: (error: DefinedBaseError) => void,
   ) {
     this.onErrorCallback = onErrorCallback;
   }
