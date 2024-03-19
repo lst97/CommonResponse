@@ -10,6 +10,48 @@ import {
 import { LogService } from "./LogService";
 import { Request } from "express";
 
+/**
+ * The `ErrorHandlerService` class is responsible for handling and logging errors in a Node.js application.
+ * It provides methods to handle different types of errors, add them to an error chain, and retrieve the root cause of an error based on its trace ID.
+ *
+ * Example Usage:
+ * ```javascript
+ * // Create an instance of ErrorHandlerService
+ * const errorHandler = new ErrorHandlerService();
+ *
+ * // Handle a defined base error
+ * const definedBaseError = new DefinedBaseError("An error occurred", 500, "ERROR_CODE");
+ * errorHandler.handleError({ error: definedBaseError, service: "UserService" });
+ *
+ * // Handle an unknown error
+ * const unknownError = new Error("Unknown error occurred");
+ * errorHandler.handleUnknownError({ error: unknownError, service: "UserService" });
+ * ```
+ *
+ * Main functionalities:
+ * - Handles and logs different types of errors in a Node.js application
+ * - Adds errors to an error chain and retrieves the root cause of an error
+ * - Provides methods to handle unknown database, service, controller, and server errors
+ *
+ * Methods:
+ * - `removeErrorFromChain(traceId: string): void`: Removes an error from the error chain based on its trace ID.
+ * - `log(error: Error): void`: Logs the error using the appropriate log strategy.
+ * - `getLogStrategy(error: DefinedBaseError): LogStrategy`: Returns the appropriate log strategy based on the error type.
+ * - `_handleError<T extends DefinedBaseError>(error: T): void`: Handles the error by adding it to the error chain and logging it.
+ * - `getDefinedBaseError(traceId: string): DefinedBaseError | null`: Retrieves the root base error from the error chain based on the trace ID.
+ * - `getRootCause(traceId: string): Error | null`: Retrieves the root cause of an error based on the provided trace ID.
+ * - `handleError(params: HandleErrorParams): string`: Handles the error and returns the trace ID.
+ * - `handleUnknownDatabaseError(params: HandleUnknownDatabaseErrorParams): DatabaseError`: Handles unknown database errors.
+ * - `handleUnknownServiceError(params: HandleUnknownServiceErrorParams): ServiceError`: Handles unknown service errors.
+ * - `handleUnknownControllerError(params: HandleUnknownControllerErrorParams): ControllerError`: Handles unknown controller errors.
+ * - `handleUnknownServerError(params: HandleUnknownServerErrorParams): ServerError`: Handles unknown server errors.
+ * - `handleUnknownError(params: HandleUnknownErrorParams): void`: Handles unknown errors.
+ *
+ * Fields:
+ * - `errorChains: Map<string, DefinedBaseError>`: A map that stores the error chain, where the key is the trace ID and the value is the root base error.
+ * - `onErrorCallback?: (error: DefinedBaseError) => void`: An optional callback function to be called when an error occurs.
+ * - `logger: LogService`: An instance of the LogService class used for logging errors.
+ */
 export interface IErrorHandlerService {
   removeErrorFromChain(traceId: string): void;
   getDefinedBaseError(traceId: string): DefinedBaseError | null;
@@ -132,7 +174,7 @@ class ClientAuthErrorLogStrategy implements LogStrategy {
  * Represents an error log strategy designed STRICTLY for internal test use.
  * Do not use outside of testing environments. Because this class does not have any meaning.
  *
- * @internal
+ * @internal This class should not be used outside of testing environments.
  * @test
  */
 export class TestErrorLogStrategy implements LogStrategy {
@@ -144,48 +186,6 @@ export class TestErrorLogStrategy implements LogStrategy {
   }
 }
 
-/**
- * The `ErrorHandlerService` class is responsible for handling and logging errors in a Node.js application.
- * It provides methods to handle different types of errors, add them to an error chain, and retrieve the root cause of an error based on its trace ID.
- *
- * Example Usage:
- * ```javascript
- * // Create an instance of ErrorHandlerService
- * const errorHandler = new ErrorHandlerService();
- *
- * // Handle a defined base error
- * const definedBaseError = new DefinedBaseError("An error occurred", 500, "ERROR_CODE");
- * errorHandler.handleError({ error: definedBaseError, service: "UserService" });
- *
- * // Handle an unknown error
- * const unknownError = new Error("Unknown error occurred");
- * errorHandler.handleUnknownError({ error: unknownError, service: "UserService" });
- * ```
- *
- * Main functionalities:
- * - Handles and logs different types of errors in a Node.js application
- * - Adds errors to an error chain and retrieves the root cause of an error
- * - Provides methods to handle unknown database, service, controller, and server errors
- *
- * Methods:
- * - `removeErrorFromChain(traceId: string): void`: Removes an error from the error chain based on its trace ID.
- * - `log(error: Error): void`: Logs the error using the appropriate log strategy.
- * - `getLogStrategy(error: DefinedBaseError): LogStrategy`: Returns the appropriate log strategy based on the error type.
- * - `_handleError<T extends DefinedBaseError>(error: T): void`: Handles the error by adding it to the error chain and logging it.
- * - `getDefinedBaseError(traceId: string): DefinedBaseError | null`: Retrieves the root base error from the error chain based on the trace ID.
- * - `getRootCause(traceId: string): Error | null`: Retrieves the root cause of an error based on the provided trace ID.
- * - `handleError(params: HandleErrorParams): string`: Handles the error and returns the trace ID.
- * - `handleUnknownDatabaseError(params: HandleUnknownDatabaseErrorParams): DatabaseError`: Handles unknown database errors.
- * - `handleUnknownServiceError(params: HandleUnknownServiceErrorParams): ServiceError`: Handles unknown service errors.
- * - `handleUnknownControllerError(params: HandleUnknownControllerErrorParams): ControllerError`: Handles unknown controller errors.
- * - `handleUnknownServerError(params: HandleUnknownServerErrorParams): ServerError`: Handles unknown server errors.
- * - `handleUnknownError(params: HandleUnknownErrorParams): void`: Handles unknown errors.
- *
- * Fields:
- * - `errorChains: Map<string, DefinedBaseError>`: A map that stores the error chain, where the key is the trace ID and the value is the root base error.
- * - `onErrorCallback?: (error: DefinedBaseError) => void`: An optional callback function to be called when an error occurs.
- * - `logger: LogService`: An instance of the LogService class used for logging errors.
- */
 export class ErrorHandlerService {
   private errorChains: Map<string, DefinedBaseError> = new Map();
   private onErrorCallback?: (error: DefinedBaseError) => void;
@@ -196,7 +196,7 @@ export class ErrorHandlerService {
    */
   constructor(
     private logger: LogService,
-    onErrorCallback?: (error: DefinedBaseError) => void,
+    onErrorCallback?: (error: DefinedBaseError) => void
   ) {
     this.onErrorCallback = onErrorCallback;
   }

@@ -1,6 +1,23 @@
 import * as fs from "fs";
 import { ILogService } from "./LogService";
 
+/**
+ * Provides functionality to manage and retrieve message codes and their associated response messages.
+ * The service attempts to load message codes from the following locations:
+ * 1. A custom path provided in the constructor (optional).
+ * 2. A default path within the project (`src/models/MessageCodes.json`).
+ * 3. A fallback path within the '@lst97/common_response' module.
+ *
+ * **Responsibilities:**
+ *
+ * - Loads and parses JSON-based message code files.
+ * - Provides access to the loaded response messages.
+ * - Allows retrieval of specific response messages by their code.
+ * - Handles errors during the file loading process.
+ *
+ * @class MessageCodeService
+ * @internal This class should not be used outside of the CommonResponse module.
+ */
 export interface IMessageCodeService {
   Messages: any;
   getResponseMessageByCode(code: string): ResponseMessage | undefined;
@@ -24,16 +41,30 @@ export class ResponseMessage {
   }
 }
 
+/**
+ * Provides functionality to manage and retrieve message codes and their associated response messages.
+ * The service attempts to load message codes from the following locations:
+ * 1. A custom path provided in the constructor (optional).
+ * 2. A default path within the project (`src/models/MessageCodes.json`).
+ * 3. A fallback path within the '@lst97/common_response' module.
+ *
+ * **Responsibilities:**
+ *
+ * - Loads and parses JSON-based message code files.
+ * - Provides access to the loaded response messages.
+ * - Allows retrieval of specific response messages by their code.
+ * - Handles errors during the file loading process.
+ *
+ * @internal This class should not be used outside of the CommonResponse module.
+ */
 export class MessageCodeService {
   private message: any;
   public get Messages(): ResponseMessages {
     return this.message;
   }
   private readonly defaultMessagesPath: string;
-  constructor(
-    private logService: ILogService,
-    path?: string,
-  ) {
+
+  constructor(private logService: ILogService, path?: string) {
     this.defaultMessagesPath = path || "src/models/MessageCodes.json";
     this.logService.setServiceName(MessageCodeService.name);
 
@@ -50,7 +81,7 @@ export class MessageCodeService {
         try {
           const data = fs.readFileSync(
             "node_modules/@lst97/common_response/lib/cjs/src/models/MessageCodes.json",
-            "utf8",
+            "utf8"
           );
 
           this.message = JSON.parse(data);
@@ -63,6 +94,13 @@ export class MessageCodeService {
       }
     }
   }
+
+  /**
+   * Retrieves the response message object based on the provided code.
+   *
+   * @param code - The code of the response message to retrieve.
+   * @returns The response message object matching the provided code, or undefined if no match is found.
+   */
   public getResponseMessageByCode(code: string): ResponseMessage | undefined {
     for (const category in this.Messages) {
       if (Object.prototype.hasOwnProperty.call(this.Messages, category)) {

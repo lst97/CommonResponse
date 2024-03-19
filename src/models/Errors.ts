@@ -96,7 +96,7 @@ export class DefinedBaseError extends Error {
  * Represents an error designed STRICTLY for internal test use.
  * Do not use outside of testing environments. Because this class does not have any meaning.
  *
- * @internal
+ * @internal This class should not be used outside of testing environments.
  * @test
  */
 export class TestError extends DefinedBaseError {

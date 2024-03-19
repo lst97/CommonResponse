@@ -26,7 +26,7 @@ class CommonResponseContainer {
     logService: ILogService,
     errorHandlerService: IErrorHandlerService,
     messageCodeService: IMessageCodeService,
-    responseService: IResponseService,
+    responseService: IResponseService
   ) {
     this.logService = logService;
     this.errorHandlerService = errorHandlerService;
@@ -41,13 +41,13 @@ class CommonResponseContainer {
       const messageCodeService = new MessageCodeService(logService);
       const responseService = new ResponseService(
         errorHandlerService,
-        messageCodeService,
+        messageCodeService
       );
       CommonResponseContainer._instance = new CommonResponseContainer(
         logService,
         errorHandlerService,
         messageCodeService,
-        responseService,
+        responseService
       );
     }
     return CommonResponseContainer._instance;

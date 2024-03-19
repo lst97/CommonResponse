@@ -1,5 +1,11 @@
 import pino from "pino";
-
+/**
+ * LogService class provides logging functionality using the pino library.
+ * It allows setting a custom service name and provides methods for logging error, info, warn, and debug messages.
+ *
+ * @class LogService
+ * @internal This class should not be used outside of the CommonResponse module.
+ */
 export interface ILogService {
   Logger: any;
   setServiceName(service: string): void;
@@ -9,6 +15,13 @@ export interface ILogService {
   debug(message: string): void;
 }
 
+/**
+ * LogService class provides logging functionality using the pino library.
+ * It allows setting a custom service name and provides methods for logging error, info, warn, and debug messages.
+ *
+ * @class LogService
+ * @internal This class should not be used outside of the CommonResponse module.
+ */
 export class LogService {
   private logger: any;
   public get Logger(): any {
@@ -47,6 +60,12 @@ export class LogService {
     this.serviceName = "default";
   }
 
+  /**
+   * Sets the service name to be included in log messages.
+   *
+   * @param service - The name of the service.
+   * @throws Error if an empty or invalid service name is provided.
+   */
   public setServiceName(service: string): void {
     if (service && service.trim() !== "") {
       this.serviceName = service;

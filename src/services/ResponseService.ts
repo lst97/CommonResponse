@@ -10,15 +10,36 @@ import {
 } from "../models/Errors";
 
 export interface IResponseService {
+  /**
+   * Builds an error response based on the provided error, request ID, and HTTP status.
+   * If the error is an instance of DefinedBaseError, it retrieves the root cause error
+   * and constructs a response message based on it. Otherwise, it handles the unknown error.
+   * If the error is an instance of ServerError or DatabaseError (excluding SqlRecordNotFoundError
+   * and SqlRecordExistsError), or if no message is available, a default error message is used.
+   * The response includes the status, message, request ID, and trace ID.
+   *
+   * @param error - The error object.
+   * @param requestId - The ID of the request.
+   * @param httpStatus - The HTTP status code (default: 500).
+   * @returns The built CommonResponse object containing the HTTP status and response.
+   */
   buildErrorResponse(
     error: Error,
     requestId: string,
-    httpStatus?: number,
+    httpStatus?: number
   ): CommonResponse;
+
+  /**
+   * Builds a success response object.
+   * @param data - The data to be included in the response.
+   * @param requestId - The unique identifier for the request.
+   * @param httpStatus - The HTTP status code for the response (default: 200).
+   * @returns The built success response object.
+   */
   buildSuccessResponse(
     data: any,
     requestId: string,
-    httpStatus?: number,
+    httpStatus?: number
   ): CommonResponse;
 }
 
@@ -38,7 +59,7 @@ interface CommonResponse {
 export class ResponseService {
   constructor(
     private errorHandlerService: ErrorHandlerService,
-    private messageCodeService: MessageCodeService,
+    private messageCodeService: MessageCodeService
   ) {}
 
   /**
@@ -57,7 +78,7 @@ export class ResponseService {
   public buildErrorResponse(
     error: Error,
     requestId: string,
-    httpStatus: number = 500,
+    httpStatus: number = 500
   ): CommonResponse {
     let message: ResponseMessage | null = null;
     let traceId = "";
@@ -69,13 +90,13 @@ export class ResponseService {
       });
     } else {
       const rootCause = this.errorHandlerService.getDefinedBaseError(
-        error.traceId,
+        error.traceId
       )!;
 
       if (rootCause != null) {
         message = new ResponseMessage(
           rootCause.messageCode,
-          rootCause.userMessage,
+          rootCause.userMessage
         );
 
         traceId = rootCause.traceId;
@@ -99,7 +120,7 @@ export class ResponseService {
     ) {
       message = new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationFail.Code,
-        this.messageCodeService.Messages.Common.OperationFail.Message,
+        this.messageCodeService.Messages.Common.OperationFail.Message
       );
     }
 
@@ -124,13 +145,13 @@ export class ResponseService {
   public buildSuccessResponse(
     data: any,
     requestId: string,
-    httpStatus: number = 200,
+    httpStatus: number = 200
   ): CommonResponse {
     const response = new BackendStandardResponse({
       status: "success",
       message: new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationSuccess.Code,
-        this.messageCodeService.Messages.Common.OperationSuccess.Message,
+        this.messageCodeService.Messages.Common.OperationSuccess.Message
       ),
       data,
       requestId,
