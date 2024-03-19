@@ -1,4 +1,3 @@
-import { Service } from "typedi";
 import {
   DefinedBaseError,
   ClientAuthError,
@@ -10,6 +9,35 @@ import {
 } from "../models/Errors";
 import { LogService } from "./LogService";
 import { Request } from "express";
+
+export interface IErrorHandlerService {
+  removeErrorFromChain(traceId: string): void;
+  getDefinedBaseError(traceId: string): DefinedBaseError | null;
+  getRootCause(traceId: string): Error | null;
+  handleError({ error, service }: HandleErrorParams): string;
+  handleUnknownDatabaseError({
+    error,
+    service,
+    query,
+    errorType,
+  }: HandleUnknownDatabaseErrorParams): DatabaseError;
+  handleUnknownServiceError({
+    error,
+    service,
+    errorType,
+  }: HandleUnknownServiceErrorParams): ServiceError;
+  handleUnknownControllerError({
+    error,
+    service,
+    errorType,
+  }: HandleUnknownControllerErrorParams): ControllerError;
+  handleUnknownServerError({
+    error,
+    service,
+    errorType,
+  }: HandleUnknownServerErrorParams): ServerError;
+  handleUnknownError({ error, service }: HandleUnknownErrorParams): void;
+}
 
 interface HandleErrorParams {
   error: Error;
@@ -158,7 +186,6 @@ export class TestErrorLogStrategy implements LogStrategy {
  * - `onErrorCallback?: (error: DefinedBaseError) => void`: An optional callback function to be called when an error occurs.
  * - `logger: LogService`: An instance of the LogService class used for logging errors.
  */
-@Service()
 export class ErrorHandlerService {
   private errorChains: Map<string, DefinedBaseError> = new Map();
   private onErrorCallback?: (error: DefinedBaseError) => void;

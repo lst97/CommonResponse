@@ -8,7 +8,19 @@ import {
   SqlRecordExistsError,
   SqlRecordNotFoundError,
 } from "../models/Errors";
-import { Service } from "typedi";
+
+export interface IResponseService {
+  buildErrorResponse(
+    error: Error,
+    requestId: string,
+    httpStatus?: number,
+  ): CommonResponse;
+  buildSuccessResponse(
+    data: any,
+    requestId: string,
+    httpStatus?: number,
+  ): CommonResponse;
+}
 
 /**
  * Represents a common response object.
@@ -23,7 +35,6 @@ interface CommonResponse {
  * The ResponseService class is responsible for building response objects based on provided errors,
  * request IDs, and HTTP statuses. It handles both known and unknown errors, constructs response messages, and creates instances of the BackendStandardResponse class.
  */
-@Service()
 export class ResponseService {
   constructor(
     private errorHandlerService: ErrorHandlerService,

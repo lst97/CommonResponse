@@ -1,9 +1,20 @@
 import pino from "pino";
-import { Service } from "typedi";
 
-@Service()
+export interface ILogService {
+  Logger: any;
+  setServiceName(service: string): void;
+  error(message: string): void;
+  info(message: string): void;
+  warn(message: string): void;
+  debug(message: string): void;
+}
+
 export class LogService {
-  public logger: any;
+  private logger: any;
+  public get Logger(): any {
+    return this.logger;
+  }
+
   private serviceName: string;
 
   constructor(logger?: any) {
@@ -36,23 +47,6 @@ export class LogService {
     this.serviceName = "default";
   }
 
-  private getLogger() {
-    return pino({
-      level: process.env.LOG_LEVEL || "info",
-      formatters: {
-        level: (label) => {
-          return { level: label };
-        },
-      },
-      transport: {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-          translateTime: "SYS:dd-mm-yyyy HH:MM:ss o",
-        },
-      },
-    });
-  }
   public setServiceName(service: string): void {
     if (service && service.trim() !== "") {
       this.serviceName = service;

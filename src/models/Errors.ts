@@ -1,5 +1,4 @@
-import Container from "typedi";
-import { MessageCodeService } from "../services/MessageCodeService";
+import { messageCodeService as messageCodeServiceSingletonInstance } from "../CommonResponse";
 import { v4 as uuidv4 } from "uuid";
 
 interface TestErrorParams {
@@ -124,10 +123,12 @@ export class UnknownError extends Error {
 export class ExportError extends DefinedBaseError {
   constructor({ message, messageCode, cause }: ExportErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Export.ExportFail;
+      messageCodeServiceSingletonInstance.Messages.Export.ExportFail;
 
     const responseMessage = messageCode
-      ? Container.get(MessageCodeService).getResponseMessageByCode(messageCode)
+      ? messageCodeServiceSingletonInstance.getResponseMessageByCode(
+          messageCode,
+        )
       : null;
 
     super(
@@ -145,7 +146,7 @@ export class ExportError extends DefinedBaseError {
 export class ExportAsExcelError extends ExportError {
   constructor({ message, cause }: ExportErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Export.ExportAsExcelFail;
+      messageCodeServiceSingletonInstance.Messages.Export.ExportAsExcelFail;
 
     super({
       message: message || defaultMessage.Message,
@@ -156,7 +157,7 @@ export class ExportAsExcelError extends ExportError {
 }
 export class ServerError extends DefinedBaseError {
   constructor({ message, messageCode, cause }: ServerErrorParams) {
-    const messageCodeService = Container.get(MessageCodeService);
+    const messageCodeService = messageCodeServiceSingletonInstance;
     const defaultFailedOperation =
       messageCodeService.Messages.Common.OperationFail;
 
@@ -179,7 +180,7 @@ export class ServerError extends DefinedBaseError {
 export class ServerInvalidEnvConfigError extends ServerError {
   constructor({ message }: ServerErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Server.InvalidEnvConfig;
+      messageCodeServiceSingletonInstance.Messages.Server.InvalidEnvConfig;
 
     super({
       message: message || defaultMessage.Message,
@@ -191,7 +192,7 @@ export class ServerInvalidEnvConfigError extends ServerError {
 export class ServerResourceNotFoundError extends DefinedBaseError {
   constructor(message?: string) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Common.ResourceNotFound;
+      messageCodeServiceSingletonInstance.Messages.Common.ResourceNotFound;
 
     super(
       message || defaultMessage.Message,
@@ -204,10 +205,12 @@ export class ServerResourceNotFoundError extends DefinedBaseError {
 export class ValidationError extends DefinedBaseError {
   constructor({ message, messageCode, cause }: ValidationErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Validation.InvalidRequest;
+      messageCodeServiceSingletonInstance.Messages.Validation.InvalidRequest;
 
     const responseMessage = messageCode
-      ? Container.get(MessageCodeService).getResponseMessageByCode(messageCode)
+      ? messageCodeServiceSingletonInstance.getResponseMessageByCode(
+          messageCode,
+        )
       : null;
 
     super(
@@ -225,7 +228,8 @@ export class ValidationError extends DefinedBaseError {
 export class ValidateRequestFormError extends ValidationError {
   constructor(message?: string) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Validation.InvalidRequestForm;
+      messageCodeServiceSingletonInstance.Messages.Validation
+        .InvalidRequestForm;
 
     super({
       message: message || defaultMessage.Message,
@@ -237,7 +241,7 @@ export class ValidateRequestFormError extends ValidationError {
 export class ValidateRequestParamError extends ValidationError {
   constructor(message?: string) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Validation
+      messageCodeServiceSingletonInstance.Messages.Validation
         .InvalidRequestParameter;
 
     super({
@@ -250,7 +254,8 @@ export class ValidateRequestParamError extends ValidationError {
 export class ValidateRequestQueryError extends ValidationError {
   constructor(message?: string) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Validation.InvalidRequestQuery;
+      messageCodeServiceSingletonInstance.Messages.Validation
+        .InvalidRequestQuery;
 
     super({
       message: message || defaultMessage.Message,
@@ -271,10 +276,12 @@ export class ClientAuthError extends DefinedBaseError {
     userId,
   }: ClientAuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.AuthFail;
+      messageCodeServiceSingletonInstance.Messages.Auth.AuthFail;
 
     const responseMessage = messageCode
-      ? Container.get(MessageCodeService).getResponseMessageByCode(messageCode)
+      ? messageCodeServiceSingletonInstance.getResponseMessageByCode(
+          messageCode,
+        )
       : null;
 
     super(
@@ -295,7 +302,7 @@ export class ClientAuthError extends DefinedBaseError {
 export class AuthAccessDeniedError extends ClientAuthError {
   constructor({ message, request, userId }: ClientAuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Common.AccessDenied;
+      messageCodeServiceSingletonInstance.Messages.Common.AccessDenied;
 
     super({
       message: message || defaultMessage.Message,
@@ -309,7 +316,7 @@ export class AuthAccessDeniedError extends ClientAuthError {
 export class AuthInvalidEmailError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.InvalidEmail;
+      messageCodeServiceSingletonInstance.Messages.Auth.InvalidEmail;
 
     super({
       message: message || defaultMessage.Message,
@@ -324,7 +331,7 @@ export class AuthInvalidEmailError extends ClientAuthError {
 export class AuthRegistrationFailWithDuplicatedEmailError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth
+      messageCodeServiceSingletonInstance.Messages.Auth
         .RegistrationFailWithDuplicatedEmail;
 
     super({
@@ -339,7 +346,7 @@ export class AuthRegistrationFailWithDuplicatedEmailError extends ClientAuthErro
 export class AuthInvalidPasswordError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.InvalidPassword;
+      messageCodeServiceSingletonInstance.Messages.Auth.InvalidPassword;
 
     super({
       message: message || defaultMessage.Message,
@@ -354,7 +361,7 @@ export class AuthInvalidPasswordError extends ClientAuthError {
 export class AuthInvalidCredentialsError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.InvalidCredentials;
+      messageCodeServiceSingletonInstance.Messages.Auth.InvalidCredentials;
 
     super({
       message: message || defaultMessage.Message,
@@ -369,7 +376,7 @@ export class AuthInvalidCredentialsError extends ClientAuthError {
 export class AuthAccessTokenExpiredError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.AccessTokenExpired;
+      messageCodeServiceSingletonInstance.Messages.Auth.AccessTokenExpired;
 
     super({
       message: message || defaultMessage.Message,
@@ -384,7 +391,7 @@ export class AuthAccessTokenExpiredError extends ClientAuthError {
 export class AuthAccessTokenInvalidError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.AccessTokenInvalid;
+      messageCodeServiceSingletonInstance.Messages.Auth.AccessTokenInvalid;
 
     super({
       message: message || defaultMessage.Message,
@@ -399,7 +406,7 @@ export class AuthAccessTokenInvalidError extends ClientAuthError {
 export class AuthAccessTokenMissingError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Auth.AccessTokenMissing;
+      messageCodeServiceSingletonInstance.Messages.Auth.AccessTokenMissing;
 
     super({
       message: message || defaultMessage.Message,
@@ -414,7 +421,7 @@ export class AuthAccessTokenMissingError extends ClientAuthError {
 export class ServiceError extends DefinedBaseError {
   // Generic service error
   constructor({ message, messageCode, cause }: ServiceErrorParams) {
-    const messageCodeService = Container.get(MessageCodeService);
+    const messageCodeService = messageCodeServiceSingletonInstance;
     const defaultFailedOperation =
       messageCodeService.Messages.Common.OperationFail;
 
@@ -438,7 +445,7 @@ export class ControllerError extends DefinedBaseError {
   // Generic controller error
   constructor(message?: string) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Common.OperationFail;
+      messageCodeServiceSingletonInstance.Messages.Common.OperationFail;
 
     super(
       message || defaultMessage.Message,
@@ -453,7 +460,7 @@ export class DatabaseError extends DefinedBaseError {
   query?: string;
 
   constructor({ message, messageCode, cause, query }: DatabaseErrorParams) {
-    const messageCodeService = Container.get(MessageCodeService);
+    const messageCodeService = messageCodeServiceSingletonInstance;
     const defaultFailedOperation =
       messageCodeService.Messages.Sql.OperationFail;
 
@@ -477,7 +484,7 @@ export class DatabaseError extends DefinedBaseError {
 export class PartialError extends DefinedBaseError {
   // Partial error
   constructor({ message, messageCode, cause }: PartialErrorParams) {
-    const messageCodeService = Container.get(MessageCodeService);
+    const messageCodeService = messageCodeServiceSingletonInstance;
     const defaultFailedOperation =
       messageCodeService.Messages.Common.PartialOperationFail;
 
@@ -501,7 +508,7 @@ export class PartialError extends DefinedBaseError {
 export class SqlCreateError extends DatabaseError {
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.CreateFail;
+      messageCodeServiceSingletonInstance.Messages.Sql.CreateFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -514,7 +521,7 @@ export class SqlReadError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.OperationFail;
+      messageCodeServiceSingletonInstance.Messages.Sql.OperationFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -527,7 +534,7 @@ export class SqlUpdateError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.UpdateFail;
+      messageCodeServiceSingletonInstance.Messages.Sql.UpdateFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -540,7 +547,7 @@ export class SqlDeleteError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.DeleteFail;
+      messageCodeServiceSingletonInstance.Messages.Sql.DeleteFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -553,7 +560,7 @@ export class SqlRecordNotFoundError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.RecordNotFound;
+      messageCodeServiceSingletonInstance.Messages.Sql.RecordNotFound;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -566,7 +573,7 @@ export class SqlOperationFailError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.OperationFail;
+      messageCodeServiceSingletonInstance.Messages.Sql.OperationFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -579,7 +586,7 @@ export class SqlRecordExistsError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      Container.get(MessageCodeService).Messages.Sql.RecordExists;
+      messageCodeServiceSingletonInstance.Messages.Sql.RecordExists;
 
     super({
       message: message || defaultMessage.Message,

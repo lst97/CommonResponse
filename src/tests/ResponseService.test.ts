@@ -1,29 +1,11 @@
-import Container from "typedi";
-import { MessageCodeService } from "../services/MessageCodeService";
-import { LogService } from "../services/LogService";
-import { ErrorHandlerService } from "../services/ErrorHandlerService";
-import { ResponseService } from "../services/ResponseService";
+import { IResponseService } from "../services/ResponseService";
 import { ServerError } from "../models/Errors";
 import { BackendStandardResponse } from "../models/Response";
-
+import { responseService as responseServiceSingletonInstance } from "../CommonResponse";
 describe("ResponseService", () => {
-  let responseService: ResponseService;
-
+  let responseService: IResponseService;
   beforeEach(() => {
-    Container.set(LogService, new LogService());
-    Container.set(
-      MessageCodeService,
-      new MessageCodeService(Container.get(LogService)),
-    );
-    Container.set(
-      ErrorHandlerService,
-      new ErrorHandlerService(Container.get(LogService)),
-    );
-
-    responseService = new ResponseService(
-      Container.get(ErrorHandlerService),
-      Container.get(MessageCodeService),
-    );
+    responseService = responseServiceSingletonInstance;
   });
 
   afterEach(() => {
@@ -31,11 +13,6 @@ describe("ResponseService", () => {
   });
 
   it("should return an error response object with status 'error' and a message object when given an error object and a request ID", () => {
-    const responseService = new ResponseService(
-      Container.get(ErrorHandlerService),
-      Container.get(MessageCodeService),
-    );
-
     const error = new ServerError({
       message: "Internal server error",
       messageCode: "500",

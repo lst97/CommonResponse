@@ -1,21 +1,15 @@
-import Container from "typedi";
 import { DefinedBaseError, ServerError, TestError } from "../models/Errors";
 import {
-  ErrorHandlerService,
+  IErrorHandlerService,
   TestErrorLogStrategy,
 } from "../services/ErrorHandlerService";
-import { LogService } from "../services/LogService";
-import { MessageCodeService } from "../services/MessageCodeService";
+import { errorHandlerService as errorHandlerSingletonInstance } from "../CommonResponse";
 
 describe("ErrorHandlerService", () => {
-  let errorHandlerService: ErrorHandlerService;
+  let errorHandlerService: IErrorHandlerService;
+
   beforeEach(() => {
-    Container.set(LogService, new LogService());
-    Container.set(
-      MessageCodeService,
-      new MessageCodeService(Container.get(LogService)),
-    );
-    errorHandlerService = new ErrorHandlerService(Container.get(LogService));
+    errorHandlerService = errorHandlerSingletonInstance;
   });
 
   afterEach(() => {

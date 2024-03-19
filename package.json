@@ -1,6 +1,6 @@
 {
   "name": "@lst97/common_response",
-  "version": "0.1.0-alpha.26",
+  "version": "0.1.0-alpha.30",
   "description": "This is a DEVELOPMENT package, not for production use. A common response structure for all the API's. Included basic error handling.",
   "main": "lib/cjs/index.js",
   "types": "lib/esm/index.d.ts",
@@ -22,14 +22,12 @@
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/uuid": "^9.0.8",
-    "chai": "^5.1.0",
     "jest": "^29.7.0",
-    "mocha": "^10.3.0",
     "pino": "^8.19.0",
     "pino-pretty": "^10.3.1",
+    "reflect-metadata": "^0.2.1",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typedi": "^0.10.0",
     "typescript": "^5.4.2",
     "uuid": "^9.0.1"
   }

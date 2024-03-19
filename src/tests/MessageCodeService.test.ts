@@ -1,16 +1,20 @@
-import Container from "typedi";
 import {
+  IMessageCodeService,
   MessageCodeService,
   ResponseMessage,
 } from "../services/MessageCodeService";
-import { LogService } from "../services/LogService";
-
+import { ILogService } from "../services/LogService";
+import {
+  messageCodeService as messageCodeServiceSingletonInstance,
+  logService as logServiceSingletonInstance,
+} from "../CommonResponse";
 describe("MessageCodeService", () => {
-  let messageCodeService: MessageCodeService;
+  let messageCodeService: IMessageCodeService;
+  let logService: ILogService;
 
   beforeEach(() => {
-    Container.set(LogService, new LogService());
-    messageCodeService = new MessageCodeService(Container.get(LogService));
+    messageCodeService = messageCodeServiceSingletonInstance;
+    logService = logServiceSingletonInstance;
   });
 
   afterEach(() => {
@@ -55,10 +59,7 @@ describe("MessageCodeService", () => {
 
   it("should handle MessageCodes.json not found", () => {
     const path = "invalid_path";
-    const messageCodeService = new MessageCodeService(
-      Container.get(LogService),
-      path,
-    );
+    const messageCodeService = new MessageCodeService(logService, path);
 
     expect(messageCodeService.Messages).toThrow(
       "Error loading default message codes file",

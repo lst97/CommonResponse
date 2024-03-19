@@ -1,6 +1,10 @@
 import * as fs from "fs";
-import { Service } from "typedi";
-import { LogService } from "./LogService";
+import { ILogService } from "./LogService";
+
+export interface IMessageCodeService {
+  Messages: any;
+  getResponseMessageByCode(code: string): ResponseMessage | undefined;
+}
 
 interface ResponseMessages {
   [key: string]: {
@@ -20,13 +24,14 @@ export class ResponseMessage {
   }
 }
 
-@Service()
 export class MessageCodeService {
-  public readonly Messages: ResponseMessages;
+  private message: any;
+  public get Messages(): ResponseMessages {
+    return this.message;
+  }
   private readonly defaultMessagesPath: string;
-
   constructor(
-    private logService: LogService,
+    private logService: ILogService,
     path?: string,
   ) {
     this.defaultMessagesPath = path || "src/models/MessageCodes.json";
@@ -38,7 +43,7 @@ export class MessageCodeService {
       const data = fs.readFileSync(this.defaultMessagesPath, "utf8");
 
       // TODO: should concatenate the default message codes with the custom message codes
-      this.Messages = JSON.parse(data);
+      this.message = JSON.parse(data);
     } catch (e: any) {
       if (e.code === "ENOENT") {
         // use default message codes
@@ -48,7 +53,7 @@ export class MessageCodeService {
             "utf8",
           );
 
-          this.Messages = JSON.parse(data);
+          this.message = JSON.parse(data);
         } catch (e: any) {
           throw new Error("Error loading default message codes file");
         }

@@ -1,5 +1,5 @@
-// import pino from "pino";
-import { LogService } from "../services/LogService";
+import { ILogService } from "../services/LogService";
+import { logService as logServiceSingletonInstance } from "../CommonResponse";
 
 jest.mock("pino", () => {
   return jest.fn().mockImplementation(() => {
@@ -14,10 +14,10 @@ jest.mock("pino", () => {
 });
 
 describe("LogService", () => {
-  let logService: LogService;
+  let logService: ILogService;
 
   beforeEach(() => {
-    logService = new LogService();
+    logService = logServiceSingletonInstance;
   });
 
   afterEach(() => {
@@ -65,7 +65,7 @@ describe("LogService", () => {
   it("should log error messages", () => {
     logService.setServiceName("TestService");
     logService.error("An error occurred");
-    expect(logService.logger.error).toHaveBeenCalledWith(
+    expect(logService.Logger.error).toHaveBeenCalledWith(
       { service: "TestService" },
       "An error occurred",
     );
