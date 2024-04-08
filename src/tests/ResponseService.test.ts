@@ -1,11 +1,15 @@
 import { IResponseService } from "../services/ResponseService";
 import { ServerError } from "../models/Errors";
 import { BackendStandardResponse } from "../models/Response";
-import { responseService as responseServiceSingletonInstance } from "../CommonResponse";
+import containers from "../inversify.config";
+import { CommonResponse, ICommonResponse } from "../CommonResponse";
 describe("ResponseService", () => {
   let responseService: IResponseService;
   beforeEach(() => {
-    responseService = responseServiceSingletonInstance;
+    responseService =
+      containers.inversifyContainer.get<ICommonResponse>(
+        CommonResponse,
+      ).ResponseService;
   });
 
   afterEach(() => {

@@ -1,6 +1,9 @@
 import { BackendStandardResponse, ResponseMessage } from "../models/Response";
-import { ErrorHandlerService } from "../services/ErrorHandlerService";
-import { MessageCodeService } from "./MessageCodeService";
+import {
+  ErrorHandlerService,
+  IErrorHandlerService,
+} from "../services/ErrorHandlerService";
+import { IMessageCodeService, MessageCodeService } from "./MessageCodeService";
 import {
   DefinedBaseError,
   DatabaseError,
@@ -8,6 +11,8 @@ import {
   SqlRecordExistsError,
   SqlRecordNotFoundError,
 } from "../models/Errors";
+import { injectable, inject } from "inversify";
+import containers from "../inversify.config";
 
 /**
  * The ResponseService class is responsible for building response objects based on provided errors,
@@ -30,7 +35,7 @@ export interface IResponseService {
   buildErrorResponse(
     error: Error,
     requestId: string,
-    httpStatus?: number
+    httpStatus?: number,
   ): CommonResponse;
 
   /**
@@ -43,7 +48,7 @@ export interface IResponseService {
   buildSuccessResponse(
     data: any,
     requestId: string,
-    httpStatus?: number
+    httpStatus?: number,
   ): CommonResponse;
 }
 
@@ -60,11 +65,20 @@ interface CommonResponse {
  * The ResponseService class is responsible for building response objects based on provided errors,
  * request IDs, and HTTP statuses. It handles both known and unknown errors, constructs response messages, and creates instances of the BackendStandardResponse class.
  */
+@injectable()
 export class ResponseService {
-  constructor(
-    private errorHandlerService: ErrorHandlerService,
-    private messageCodeService: MessageCodeService
-  ) {}
+  private errorHandlerService: IErrorHandlerService;
+  private messageCodeService: IMessageCodeService;
+  constructor() {
+    this.errorHandlerService =
+      containers.inversifyContainer.get<IErrorHandlerService>(
+        ErrorHandlerService,
+      );
+    this.messageCodeService =
+      containers.inversifyContainer.get<IMessageCodeService>(
+        MessageCodeService,
+      );
+  }
 
   /**
    * Builds an error response based on the provided error, request ID, and HTTP status.
@@ -82,7 +96,7 @@ export class ResponseService {
   public buildErrorResponse(
     error: Error,
     requestId: string,
-    httpStatus: number = 500
+    httpStatus: number = 500,
   ): CommonResponse {
     let message: ResponseMessage | null = null;
     let traceId = "";
@@ -94,13 +108,13 @@ export class ResponseService {
       });
     } else {
       const rootCause = this.errorHandlerService.getDefinedBaseError(
-        error.traceId
+        error.traceId,
       )!;
 
       if (rootCause != null) {
         message = new ResponseMessage(
           rootCause.messageCode,
-          rootCause.userMessage
+          rootCause.userMessage,
         );
 
         traceId = rootCause.traceId;
@@ -124,7 +138,7 @@ export class ResponseService {
     ) {
       message = new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationFail.Code,
-        this.messageCodeService.Messages.Common.OperationFail.Message
+        this.messageCodeService.Messages.Common.OperationFail.Message,
       );
     }
 
@@ -149,13 +163,13 @@ export class ResponseService {
   public buildSuccessResponse(
     data: any,
     requestId: string,
-    httpStatus: number = 200
+    httpStatus: number = 200,
   ): CommonResponse {
     const response = new BackendStandardResponse({
       status: "success",
       message: new ResponseMessage(
         this.messageCodeService.Messages.Common.OperationSuccess.Code,
-        this.messageCodeService.Messages.Common.OperationSuccess.Message
+        this.messageCodeService.Messages.Common.OperationSuccess.Message,
       ),
       data,
       requestId,

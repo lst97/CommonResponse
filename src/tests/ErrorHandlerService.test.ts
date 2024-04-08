@@ -1,15 +1,19 @@
+import containers from "../inversify.config";
 import { DefinedBaseError, ServerError, TestError } from "../models/Errors";
 import {
+  ErrorHandlerService,
   IErrorHandlerService,
   TestErrorLogStrategy,
 } from "../services/ErrorHandlerService";
-import { errorHandlerService as errorHandlerSingletonInstance } from "../CommonResponse";
 
 describe("ErrorHandlerService", () => {
   let errorHandlerService: IErrorHandlerService;
 
   beforeEach(() => {
-    errorHandlerService = errorHandlerSingletonInstance;
+    errorHandlerService =
+      containers.inversifyContainer.get<IErrorHandlerService>(
+        ErrorHandlerService,
+      );
   });
 
   afterEach(() => {

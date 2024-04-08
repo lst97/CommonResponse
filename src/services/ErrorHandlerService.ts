@@ -1,3 +1,4 @@
+import { inject, injectable } from "inversify";
 import {
   DefinedBaseError,
   ClientAuthError,
@@ -7,8 +8,10 @@ import {
   ServiceError,
   TestError,
 } from "../models/Errors";
-import { LogService } from "./LogService";
+import { ILogService, LogService } from "./LogService";
 import { Request } from "express";
+import containers from "../inversify.config";
+import { CommonResponse, ICommonResponse } from "../CommonResponse";
 
 /**
  * The `ErrorHandlerService` class is responsible for handling and logging errors in a Node.js application.
@@ -186,19 +189,24 @@ export class TestErrorLogStrategy implements LogStrategy {
   }
 }
 
+@injectable()
 export class ErrorHandlerService {
+  private onErrorCallback: (error: DefinedBaseError) => void;
+  private logger: ILogService;
   private errorChains: Map<string, DefinedBaseError> = new Map();
-  private onErrorCallback?: (error: DefinedBaseError) => void;
 
   /**
    * Constructs an instance of ErrorHandlerService.
-   * @param {function} onErrorCallback - The callback function to be called when an error occurs.
    */
-  constructor(
-    private logger: LogService,
-    onErrorCallback?: (error: DefinedBaseError) => void,
-  ) {
-    this.onErrorCallback = onErrorCallback;
+  constructor() {
+    this.onErrorCallback =
+      containers.inversifyContainer.get<(error: DefinedBaseError) => void>(
+        "ErrorCallback",
+      );
+    this.logger =
+      containers.inversifyContainer.get<ICommonResponse>(
+        CommonResponse,
+      ).LogService;
   }
 
   public removeErrorFromChain(traceId: string): void {
@@ -289,9 +297,8 @@ export class ErrorHandlerService {
     this.logger.setServiceName(service);
 
     if (error instanceof DefinedBaseError) {
-      if (this.onErrorCallback) {
-        this.onErrorCallback(error);
-      }
+      this.onErrorCallback(error);
+
       this._handleError(error);
       return error.traceId;
     } else {
@@ -301,9 +308,9 @@ export class ErrorHandlerService {
         message: `Server error: ${error.message}`,
       });
       serverError.cause = error;
-      if (this.onErrorCallback) {
-        this.onErrorCallback(serverError);
-      }
+
+      this.onErrorCallback(serverError);
+
       this._handleError(serverError);
       return serverError.traceId;
     }

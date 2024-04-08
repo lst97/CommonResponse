@@ -1,4 +1,38 @@
-import pino from "pino";
+import { injectable } from "inversify";
+import pino, { Logger } from "pino";
+import containers from "../inversify.config";
+
+export const usePino = () => {
+  return pino({
+    level: process.env.LOG_LEVEL || "info",
+    formatters: {
+      level: (label) => {
+        return { level: label };
+      },
+    },
+    transport: {
+      target: "pino-pretty",
+      options: {
+        colorize: true,
+        translateTime: "SYS:dd-mm-yyyy HH:MM:ss o",
+      },
+    },
+  });
+};
+
+/**
+ * ILogger interface provides a contract for logging error, info, warn, and debug messages.
+ *
+ * @interface ILogger
+ * @internal This interface should not be used outside of the CommonResponse module.
+ */
+export interface ILogger {
+  error({ service }: { service: string }, message: string): void;
+  info({ service }: { service: string }, message: string): void;
+  warn({ service }: { service: string }, message: string): void;
+  debug({ service }: { service: string }, message: string): void;
+}
+
 /**
  * LogService class provides logging functionality using the pino library.
  * It allows setting a custom service name and provides methods for logging error, info, warn, and debug messages.
@@ -22,40 +56,17 @@ export interface ILogService {
  * @class LogService
  * @internal This class should not be used outside of the CommonResponse module.
  */
-export class LogService {
-  private logger: any;
-  public get Logger(): any {
+@injectable()
+export class LogService implements ILogService {
+  private logger: ILogger;
+  public get Logger(): ILogger {
     return this.logger;
   }
 
   private serviceName: string;
 
-  constructor(logger?: any) {
-    // If logger is provided, use it
-    if (logger) {
-      this.logger = logger;
-    } else {
-      // Pino pretty configuration: https://getpino.io/#/docs/pretty
-      this.logger = pino({
-        level: process.env.LOG_LEVEL || "info",
-        formatters: {
-          level: (label) => {
-            return { level: label };
-          },
-        },
-        transport: {
-          target: "pino-pretty",
-          options: {
-            colorize: true,
-            translateTime: "SYS:dd-mm-yyyy HH:MM:ss o",
-          },
-        },
-      });
-
-      if (this.logger === undefined) {
-        throw new Error("Logger not created");
-      }
-    }
+  constructor() {
+    this.logger = containers.inversifyContainer.get<Logger<never>>("Logger");
 
     this.serviceName = "default";
   }

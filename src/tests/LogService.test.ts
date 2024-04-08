@@ -1,5 +1,5 @@
-import { ILogService } from "../services/LogService";
-import { logService as logServiceSingletonInstance } from "../CommonResponse";
+import containers from "../inversify.config";
+import { ILogService, LogService } from "../services/LogService";
 
 jest.mock("pino", () => {
   return jest.fn().mockImplementation(() => {
@@ -17,7 +17,7 @@ describe("LogService", () => {
   let logService: ILogService;
 
   beforeEach(() => {
-    logService = logServiceSingletonInstance;
+    logService = containers.inversifyContainer.get<ILogService>(LogService);
   });
 
   afterEach(() => {

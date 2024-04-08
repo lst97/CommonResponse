@@ -1,5 +1,8 @@
 import * as fs from "fs";
 import { ILogService } from "./LogService";
+import { injectable } from "inversify";
+import containers, { Containers } from "../inversify.config";
+import { CommonResponse, ICommonResponse } from "../CommonResponse";
 
 /**
  * Provides functionality to manage and retrieve message codes and their associated response messages.
@@ -57,24 +60,30 @@ export class ResponseMessage {
  *
  * @internal This class should not be used outside of the CommonResponse module.
  */
+@injectable()
 export class MessageCodeService {
+  private path: string;
+  private logService: ILogService;
   private message: any;
   public get Messages(): ResponseMessages {
     return this.message;
   }
-  private readonly defaultMessagesPath: string;
 
-  constructor(
-    private logService: ILogService,
-    path?: string,
-  ) {
-    this.defaultMessagesPath = path || "src/models/MessageCodes.json";
+  constructor() {
+    this.logService =
+      containers.inversifyContainer.get<ICommonResponse>(
+        CommonResponse,
+      ).LogService;
+    this.path = containers.inversifyContainer.get<string>(
+      "MessageCodesJsonPath",
+    );
+
     this.logService.setServiceName(MessageCodeService.name);
 
     try {
       // try to read if developer has provided custom message codes
       // otherwise use default message codes
-      const data = fs.readFileSync(this.defaultMessagesPath, "utf8");
+      const data = fs.readFileSync(this.path, "utf8");
 
       // TODO: should concatenate the default message codes with the custom message codes
       this.message = JSON.parse(data);
