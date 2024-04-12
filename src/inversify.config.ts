@@ -4,13 +4,12 @@ import {
   IErrorHandlerService,
 } from "./services/ErrorHandlerService";
 import { IResponseService, ResponseService } from "./services/ResponseService";
-import { ILogService, LogService, usePino } from "./services/LogService";
+import { ILogService, LogService } from "./services/LogService";
 import {
   IMessageCodeService,
   MessageCodeService,
 } from "./services/MessageCodeService";
 import { DefinedBaseError } from "./models/Errors";
-import { CommonResponse, ICommonResponse } from "./CommonResponse";
 import pino, { Logger } from "pino";
 
 /**
@@ -21,11 +20,29 @@ import pino, { Logger } from "pino";
  *
  */
 export class Containers {
+  private static _instance: Containers;
+  private _traceIdIdentifier: string;
   private container: Container;
 
-  constructor() {
+  private constructor() {
     this.container = new Container();
     this.buildContainers();
+    this._traceIdIdentifier = "unknown";
+  }
+
+  public set traceIdIdentifier(value: string) {
+    this._traceIdIdentifier = value;
+  }
+
+  public get traceIdIdentifier() {
+    return this._traceIdIdentifier;
+  }
+
+  public static get instance() {
+    if (!Containers._instance) {
+      Containers._instance = new Containers();
+    }
+    return Containers._instance;
   }
 
   public get inversifyContainer() {
@@ -38,7 +55,7 @@ export class Containers {
   }
 
   // Arguments that required for the services
-  public buildConstantsContainer() {
+  private buildConstantsContainer() {
     // using pino for logging with pretty print by default
     const logger = pino({
       level: process.env.LOG_LEVEL || "info",
@@ -101,15 +118,6 @@ export class Containers {
         .toSelf()
         .inSingletonScope();
     }
-
-    try {
-      this.container.get<ICommonResponse>(CommonResponse);
-    } catch (e) {
-      this.container
-        .bind<ICommonResponse>(CommonResponse)
-        .toSelf()
-        .inSingletonScope();
-    }
   }
 
   public useInversify(container: Container) {
@@ -119,5 +127,11 @@ export class Containers {
   }
 }
 
-const containers = new Containers();
-export default containers;
+export const useInversify = (container: Container) => {
+  // use the user provided container to build the middleware containers
+  Containers.instance.useInversify(container);
+};
+
+export const inversifyContainer = () => {
+  return Containers.instance.inversifyContainer;
+};

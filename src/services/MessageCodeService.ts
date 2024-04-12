@@ -1,9 +1,7 @@
 import * as fs from "fs";
-import { ILogService } from "./LogService";
+import { ILogService, LogService } from "./LogService";
 import { injectable } from "inversify";
-import containers, { Containers } from "../inversify.config";
-import { CommonResponse, ICommonResponse } from "../CommonResponse";
-
+import { inversifyContainer } from "../inversify.config";
 /**
  * Provides functionality to manage and retrieve message codes and their associated response messages.
  * The service attempts to load message codes from the following locations:
@@ -70,13 +68,8 @@ export class MessageCodeService {
   }
 
   constructor() {
-    this.logService =
-      containers.inversifyContainer.get<ICommonResponse>(
-        CommonResponse,
-      ).LogService;
-    this.path = containers.inversifyContainer.get<string>(
-      "MessageCodesJsonPath",
-    );
+    this.logService = inversifyContainer().get<ILogService>(LogService);
+    this.path = inversifyContainer().get<string>("MessageCodesJsonPath");
 
     this.logService.setServiceName(MessageCodeService.name);
 
@@ -129,6 +122,10 @@ export class MessageCodeService {
       }
     }
   }
+}
+
+export function getMessageCodeService(): IMessageCodeService {
+  return inversifyContainer().get<IMessageCodeService>(MessageCodeService);
 }
 
 // // ...other imports

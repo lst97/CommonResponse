@@ -1,5 +1,5 @@
-import containers from "../inversify.config";
-import { ILogService, LogService } from "../services/LogService";
+import { Config } from "../CommonResponse.config";
+import { ILogService, getLogService } from "../services/LogService";
 
 jest.mock("pino", () => {
   return jest.fn().mockImplementation(() => {
@@ -17,7 +17,8 @@ describe("LogService", () => {
   let logService: ILogService;
 
   beforeEach(() => {
-    logService = containers.inversifyContainer.get<ILogService>(LogService);
+    Config.instance.traceIdIdentifier = "mock_identifier_LogService";
+    logService = getLogService();
   });
 
   afterEach(() => {

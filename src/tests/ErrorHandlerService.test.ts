@@ -1,19 +1,17 @@
-import containers from "../inversify.config";
+import { Config } from "../CommonResponse.config";
 import { DefinedBaseError, ServerError, TestError } from "../models/Errors";
 import {
-  ErrorHandlerService,
   IErrorHandlerService,
   TestErrorLogStrategy,
+  ErrorHandlerServiceInstance,
 } from "../services/ErrorHandlerService";
 
 describe("ErrorHandlerService", () => {
   let errorHandlerService: IErrorHandlerService;
 
   beforeEach(() => {
-    errorHandlerService =
-      containers.inversifyContainer.get<IErrorHandlerService>(
-        ErrorHandlerService,
-      );
+    Config.instance.traceIdIdentifier = "mock_identifier_ErrorHandlerService";
+    errorHandlerService = ErrorHandlerServiceInstance();
   });
 
   afterEach(() => {

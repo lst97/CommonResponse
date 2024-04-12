@@ -1,15 +1,15 @@
-import { IResponseService } from "../services/ResponseService";
+import { IResponseService, ResponseService } from "../services/ResponseService";
 import { ServerError } from "../models/Errors";
 import { BackendStandardResponse } from "../models/Response";
-import containers from "../inversify.config";
-import { CommonResponse, ICommonResponse } from "../CommonResponse";
+import { inversifyContainer } from "../inversify.config";
+import { Config } from "../CommonResponse.config";
+
 describe("ResponseService", () => {
   let responseService: IResponseService;
   beforeEach(() => {
+    Config.instance.traceIdIdentifier = "mock_identifier_ResponseService";
     responseService =
-      containers.inversifyContainer.get<ICommonResponse>(
-        CommonResponse,
-      ).ResponseService;
+      inversifyContainer().get<IResponseService>(ResponseService);
   });
 
   afterEach(() => {

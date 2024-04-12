@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
 import pino, { Logger } from "pino";
-import containers from "../inversify.config";
+import { inversifyContainer } from "../inversify.config";
 
 export const usePino = () => {
   return pino({
@@ -66,7 +66,7 @@ export class LogService implements ILogService {
   private serviceName: string;
 
   constructor() {
-    this.logger = containers.inversifyContainer.get<Logger<never>>("Logger");
+    this.logger = inversifyContainer().get<Logger<never>>("Logger");
 
     this.serviceName = "default";
   }
@@ -108,4 +108,8 @@ export class LogService implements ILogService {
       this.logger.debug({ service: this.serviceName }, message);
     }
   }
+}
+
+export function getLogService(): ILogService {
+  return inversifyContainer().get<ILogService>(LogService);
 }

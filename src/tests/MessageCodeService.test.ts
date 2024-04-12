@@ -1,20 +1,18 @@
 import {
   IMessageCodeService,
-  MessageCodeService,
   ResponseMessage,
+  getMessageCodeService,
 } from "../services/MessageCodeService";
-import { ILogService, LogService } from "../services/LogService";
-import containers from "../inversify.config";
+import { ILogService, getLogService } from "../services/LogService";
+import { Config } from "../CommonResponse.config";
 describe("MessageCodeService", () => {
   let messageCodeService: IMessageCodeService;
   let logService: ILogService;
 
   beforeEach(() => {
-    messageCodeService =
-      containers.inversifyContainer.get<IMessageCodeService>(
-        MessageCodeService,
-      );
-    logService = containers.inversifyContainer.get<ILogService>(LogService);
+    Config.instance.traceIdIdentifier = "mock_identifier_MessageCodeService";
+    messageCodeService = getMessageCodeService();
+    logService = getLogService();
   });
 
   afterEach(() => {

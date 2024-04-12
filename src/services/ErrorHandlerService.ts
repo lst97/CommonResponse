@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { injectable } from "inversify";
 import {
   DefinedBaseError,
   ClientAuthError,
@@ -10,8 +10,7 @@ import {
 } from "../models/Errors";
 import { ILogService, LogService } from "./LogService";
 import { Request } from "express";
-import containers from "../inversify.config";
-import { CommonResponse, ICommonResponse } from "../CommonResponse";
+import { inversifyContainer } from "../inversify.config";
 
 /**
  * The `ErrorHandlerService` class is responsible for handling and logging errors in a Node.js application.
@@ -189,6 +188,14 @@ export class TestErrorLogStrategy implements LogStrategy {
   }
 }
 
+/**
+ * The `ErrorHandlerService` class is responsible for handling and logging errors.
+ * It provides methods to handle different types of errors, add them to an error chain, and retrieve the root cause of an error based on its trace ID.
+ *
+ * @implements {IErrorHandlerService}
+ * @remark Don't create an instance of this class directly. Use the `ErrorHandlerServiceInstance` function to get the singleton instance.
+ * @remark Only use this class for DI injection identifier.
+ */
 @injectable()
 export class ErrorHandlerService {
   private onErrorCallback: (error: DefinedBaseError) => void;
@@ -200,13 +207,10 @@ export class ErrorHandlerService {
    */
   constructor() {
     this.onErrorCallback =
-      containers.inversifyContainer.get<(error: DefinedBaseError) => void>(
+      inversifyContainer().get<(error: DefinedBaseError) => void>(
         "ErrorCallback",
       );
-    this.logger =
-      containers.inversifyContainer.get<ICommonResponse>(
-        CommonResponse,
-      ).LogService;
+    this.logger = inversifyContainer().get<ILogService>(LogService);
   }
 
   public removeErrorFromChain(traceId: string): void {
@@ -418,3 +422,11 @@ export class ErrorHandlerService {
     });
   }
 }
+
+/**
+ * Get the singleton instance of the ErrorHandlerService class.
+ * @returns {IErrorHandlerService} - The instance of the ErrorHandlerService class.
+ */
+export const ErrorHandlerServiceInstance = (): IErrorHandlerService => {
+  return inversifyContainer().get<IErrorHandlerService>(ErrorHandlerService);
+};

@@ -11,8 +11,8 @@ import {
   SqlRecordExistsError,
   SqlRecordNotFoundError,
 } from "../models/Errors";
-import { injectable, inject } from "inversify";
-import containers from "../inversify.config";
+import { injectable } from "inversify";
+import { inversifyContainer } from "../inversify.config";
 
 /**
  * The ResponseService class is responsible for building response objects based on provided errors,
@@ -64,20 +64,20 @@ interface CommonResponse {
 /**
  * The ResponseService class is responsible for building response objects based on provided errors,
  * request IDs, and HTTP statuses. It handles both known and unknown errors, constructs response messages, and creates instances of the BackendStandardResponse class.
+ *
+ * @implements {IResponseService}
+ * @remark Don't create an instance of this class directly. Use the `ResponseServiceInstance` function to get the singleton instance.
+ * @remark Only use this class for DI injection identifier.
  */
 @injectable()
-export class ResponseService {
+export class ResponseService implements IResponseService {
   private errorHandlerService: IErrorHandlerService;
   private messageCodeService: IMessageCodeService;
   constructor() {
     this.errorHandlerService =
-      containers.inversifyContainer.get<IErrorHandlerService>(
-        ErrorHandlerService,
-      );
+      inversifyContainer().get<IErrorHandlerService>(ErrorHandlerService);
     this.messageCodeService =
-      containers.inversifyContainer.get<IMessageCodeService>(
-        MessageCodeService,
-      );
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService);
   }
 
   /**
@@ -178,3 +178,11 @@ export class ResponseService {
     return { httpStatus: httpStatus, response: response };
   }
 }
+
+/**
+ * Returns the singleton instance of the ResponseService class.
+ * @returns The singleton instance of the ResponseService class.
+ */
+export const ResponseServiceInstance = () => {
+  return inversifyContainer().get<IResponseService>(ResponseService);
+};

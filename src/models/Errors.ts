@@ -1,10 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-import containers from "../inversify.config";
 import {
   IMessageCodeService,
   MessageCodeService,
 } from "../services/MessageCodeService";
 import { injectable } from "inversify";
+import { inversifyContainer } from "../inversify.config";
+import { Config } from "../CommonResponse.config";
 
 interface TestErrorParams {
   message?: string;
@@ -94,7 +95,7 @@ export class DefinedBaseError extends Error {
     this.httpStatus = httpStatus;
     this.userMessage = userMessage || message;
     this.messageCode = messageCode;
-    this.traceId = `stzita.traceId.${uuidv4()}`;
+    this.traceId = `${Config.instance.traceIdIdentifier}.traceId.${uuidv4()}`;
   }
 }
 
@@ -129,11 +130,11 @@ export class UnknownError extends Error {
 export class ExportError extends DefinedBaseError {
   constructor({ message, messageCode, cause }: ExportErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Export.ExportFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Export.ExportFail;
 
     const responseMessage = messageCode
-      ? containers.inversifyContainer
+      ? inversifyContainer()
           .get<IMessageCodeService>(MessageCodeService)
           .getResponseMessageByCode(messageCode)
       : null;
@@ -153,8 +154,8 @@ export class ExportError extends DefinedBaseError {
 export class ExportAsExcelError extends ExportError {
   constructor({ message, cause }: ExportErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Export.ExportAsExcelFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Export.ExportAsExcelFail;
 
     super({
       message: message || defaultMessage.Message,
@@ -166,9 +167,7 @@ export class ExportAsExcelError extends ExportError {
 export class ServerError extends DefinedBaseError {
   constructor({ message, messageCode, cause }: ServerErrorParams) {
     const messageCodeService =
-      containers.inversifyContainer.get<IMessageCodeService>(
-        MessageCodeService,
-      );
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService);
     const defaultFailedOperation =
       messageCodeService.Messages.Common.OperationFail;
 
@@ -191,8 +190,8 @@ export class ServerError extends DefinedBaseError {
 export class ServerInvalidEnvConfigError extends ServerError {
   constructor({ message }: ServerErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Server.InvalidEnvConfig;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Server.InvalidEnvConfig;
 
     super({
       message: message || defaultMessage.Message,
@@ -204,8 +203,8 @@ export class ServerInvalidEnvConfigError extends ServerError {
 export class ServerResourceNotFoundError extends DefinedBaseError {
   constructor(message?: string) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Common.ResourceNotFound;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Common.ResourceNotFound;
 
     super(
       message || defaultMessage.Message,
@@ -218,11 +217,11 @@ export class ServerResourceNotFoundError extends DefinedBaseError {
 export class ValidationError extends DefinedBaseError {
   constructor({ message, messageCode, cause }: ValidationErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Validation.InvalidRequest;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Validation.InvalidRequest;
 
     const responseMessage = messageCode
-      ? containers.inversifyContainer
+      ? inversifyContainer()
           .get<IMessageCodeService>(MessageCodeService)
           .getResponseMessageByCode(messageCode)
       : null;
@@ -242,8 +241,8 @@ export class ValidationError extends DefinedBaseError {
 export class ValidateRequestFormError extends ValidationError {
   constructor(message?: string) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Validation.InvalidRequestForm;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Validation.InvalidRequestForm;
 
     super({
       message: message || defaultMessage.Message,
@@ -255,8 +254,8 @@ export class ValidateRequestFormError extends ValidationError {
 export class ValidateRequestParamError extends ValidationError {
   constructor(message?: string) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Validation.InvalidRequestParameter;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Validation.InvalidRequestParameter;
 
     super({
       message: message || defaultMessage.Message,
@@ -268,8 +267,8 @@ export class ValidateRequestParamError extends ValidationError {
 export class ValidateRequestQueryError extends ValidationError {
   constructor(message?: string) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Validation.InvalidRequestQuery;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Validation.InvalidRequestQuery;
 
     super({
       message: message || defaultMessage.Message,
@@ -290,11 +289,11 @@ export class ClientAuthError extends DefinedBaseError {
     userId,
   }: ClientAuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.AuthFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.AuthFail;
 
     const responseMessage = messageCode
-      ? containers.inversifyContainer
+      ? inversifyContainer()
           .get<IMessageCodeService>(MessageCodeService)
           .getResponseMessageByCode(messageCode)
       : null;
@@ -317,8 +316,8 @@ export class ClientAuthError extends DefinedBaseError {
 export class AuthAccessDeniedError extends ClientAuthError {
   constructor({ message, request, userId }: ClientAuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Common.AccessDenied;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Common.AccessDenied;
 
     super({
       message: message || defaultMessage.Message,
@@ -332,8 +331,8 @@ export class AuthAccessDeniedError extends ClientAuthError {
 export class AuthInvalidEmailError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.InvalidEmail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.InvalidEmail;
 
     super({
       message: message || defaultMessage.Message,
@@ -348,8 +347,8 @@ export class AuthInvalidEmailError extends ClientAuthError {
 export class AuthRegistrationFailWithDuplicatedEmailError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.RegistrationFailWithDuplicatedEmail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.RegistrationFailWithDuplicatedEmail;
 
     super({
       message: message || defaultMessage.Message,
@@ -363,8 +362,8 @@ export class AuthRegistrationFailWithDuplicatedEmailError extends ClientAuthErro
 export class AuthInvalidPasswordError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.InvalidPassword;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.InvalidPassword;
 
     super({
       message: message || defaultMessage.Message,
@@ -379,8 +378,8 @@ export class AuthInvalidPasswordError extends ClientAuthError {
 export class AuthInvalidCredentialsError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.InvalidCredentials;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.InvalidCredentials;
 
     super({
       message: message || defaultMessage.Message,
@@ -395,8 +394,8 @@ export class AuthInvalidCredentialsError extends ClientAuthError {
 export class AuthAccessTokenExpiredError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.AccessTokenExpired;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.AccessTokenExpired;
 
     super({
       message: message || defaultMessage.Message,
@@ -411,8 +410,8 @@ export class AuthAccessTokenExpiredError extends ClientAuthError {
 export class AuthAccessTokenInvalidError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.AccessTokenInvalid;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.AccessTokenInvalid;
 
     super({
       message: message || defaultMessage.Message,
@@ -427,8 +426,8 @@ export class AuthAccessTokenInvalidError extends ClientAuthError {
 export class AuthAccessTokenMissingError extends ClientAuthError {
   constructor({ message, messageCode, cause, request }: AuthErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Auth.AccessTokenMissing;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Auth.AccessTokenMissing;
 
     super({
       message: message || defaultMessage.Message,
@@ -444,9 +443,7 @@ export class ServiceError extends DefinedBaseError {
   // Generic service error
   constructor({ message, messageCode, cause }: ServiceErrorParams) {
     const messageCodeService =
-      containers.inversifyContainer.get<IMessageCodeService>(
-        MessageCodeService,
-      );
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService);
     const defaultFailedOperation =
       messageCodeService.Messages.Common.OperationFail;
 
@@ -470,8 +467,8 @@ export class ControllerError extends DefinedBaseError {
   // Generic controller error
   constructor(message?: string) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Common.OperationFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Common.OperationFail;
 
     super(
       message || defaultMessage.Message,
@@ -487,9 +484,7 @@ export class DatabaseError extends DefinedBaseError {
 
   constructor({ message, messageCode, cause, query }: DatabaseErrorParams) {
     const messageCodeService =
-      containers.inversifyContainer.get<IMessageCodeService>(
-        MessageCodeService,
-      );
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService);
     const defaultFailedOperation =
       messageCodeService.Messages.Sql.OperationFail;
 
@@ -514,9 +509,7 @@ export class PartialError extends DefinedBaseError {
   // Partial error
   constructor({ message, messageCode, cause }: PartialErrorParams) {
     const messageCodeService =
-      containers.inversifyContainer.get<IMessageCodeService>(
-        MessageCodeService,
-      );
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService);
     const defaultFailedOperation =
       messageCodeService.Messages.Common.PartialOperationFail;
 
@@ -540,8 +533,8 @@ export class PartialError extends DefinedBaseError {
 export class SqlCreateError extends DatabaseError {
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.CreateFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.CreateFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -554,8 +547,8 @@ export class SqlReadError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.OperationFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.OperationFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -568,8 +561,8 @@ export class SqlUpdateError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.UpdateFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.UpdateFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -582,8 +575,8 @@ export class SqlDeleteError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.DeleteFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.DeleteFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -596,8 +589,8 @@ export class SqlRecordNotFoundError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.RecordNotFound;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.RecordNotFound;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -610,8 +603,8 @@ export class SqlOperationFailError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.OperationFail;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.OperationFail;
 
     super({ message: message || defaultMessage.Message, cause });
 
@@ -624,8 +617,8 @@ export class SqlRecordExistsError extends DatabaseError {
 
   constructor({ message, query, cause }: SqlErrorParams) {
     const defaultMessage =
-      containers.inversifyContainer.get<IMessageCodeService>(MessageCodeService)
-        .Messages.Sql.RecordExists;
+      inversifyContainer().get<IMessageCodeService>(MessageCodeService).Messages
+        .Sql.RecordExists;
 
     super({
       message: message || defaultMessage.Message,
