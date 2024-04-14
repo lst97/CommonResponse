@@ -10,7 +10,10 @@ describe("MessageCodeService", () => {
   let logService: ILogService;
 
   beforeEach(() => {
-    Config.instance.traceIdIdentifier = "mock_identifier_MessageCodeService";
+    Config.instance.idIdentifier = "mock_identifier_MessageCodeService";
+    Config.instance.requestIdName = "requestId_test";
+    Config.instance.traceIdName = "traceId_test";
+
     messageCodeService = getMessageCodeService();
     logService = getLogService();
   });

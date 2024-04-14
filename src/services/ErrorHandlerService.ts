@@ -11,6 +11,7 @@ import {
 import { ILogService, LogService } from "./LogService";
 import { Request } from "express";
 import { inversifyContainer } from "../inversify.config";
+import { Config } from "../CommonResponse.config";
 
 /**
  * The `ErrorHandlerService` class is responsible for handling and logging errors in a Node.js application.
@@ -126,7 +127,7 @@ class BaseLogMessage {
   private baseLogMessage: string[] = [];
 
   constructor(error: DefinedBaseError) {
-    this.baseLogMessage.push(`${error.message} - ${error.traceId}`);
+    this.baseLogMessage.push(`${error.message}`);
     this.baseLogMessage.push(`httpStatus: ${error.httpStatus ?? "N/A"}`);
     this.baseLogMessage.push(`userMessage: ${error.userMessage ?? "N/A"}`);
     this.baseLogMessage.push(`messageCode: ${error.messageCode ?? "N/A"}`);

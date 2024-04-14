@@ -21,21 +21,21 @@ import pino, { Logger } from "pino";
  */
 export class Containers {
   private static _instance: Containers;
-  private _traceIdIdentifier: string;
+  private _idIdentifier: string;
   private container: Container;
 
   private constructor() {
     this.container = new Container();
     this.buildContainers();
-    this._traceIdIdentifier = "unknown";
+    this._idIdentifier = "unknown";
   }
 
-  public set traceIdIdentifier(value: string) {
-    this._traceIdIdentifier = value;
+  public set idIdentifier(value: string) {
+    this._idIdentifier = value;
   }
 
-  public get traceIdIdentifier() {
-    return this._traceIdIdentifier;
+  public get idIdentifier() {
+    return this._idIdentifier;
   }
 
   public static get instance() {
@@ -127,11 +127,28 @@ export class Containers {
   }
 }
 
+/**
+ * For the user to inject the services into the application.
+ *
+ * @param container - The user provided container.
+ *
+ * @example
+ * ```typescript
+ * import { useInversify } from '@lst97/common_response';
+  const container = new Container();
+  function buildLibContainers() {
+    useInversify(container);
+  }
+ * ```
+ */
 export const useInversify = (container: Container) => {
-  // use the user provided container to build the middleware containers
   Containers.instance.useInversify(container);
 };
 
+/**
+ * For internal use only.
+ * @returns the singleton instance of the container
+ */
 export const inversifyContainer = () => {
   return Containers.instance.inversifyContainer;
 };

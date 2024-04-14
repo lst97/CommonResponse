@@ -95,7 +95,9 @@ export class DefinedBaseError extends Error {
     this.httpStatus = httpStatus;
     this.userMessage = userMessage || message;
     this.messageCode = messageCode;
-    this.traceId = `${Config.instance.traceIdIdentifier}.traceId.${uuidv4()}`;
+    this.traceId = `${Config.instance.idIdentifier}.${
+      Config.instance.traceIdName
+    }.${uuidv4()}`;
   }
 }
 

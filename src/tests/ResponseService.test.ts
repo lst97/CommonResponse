@@ -7,7 +7,10 @@ import { IBackendStandardResponse } from "@lst97/common-response-structure";
 describe("ResponseService", () => {
   let responseService: IResponseService;
   beforeEach(() => {
-    Config.instance.traceIdIdentifier = "mock_identifier_ResponseService";
+    Config.instance.idIdentifier = "mock_identifier_ResponseService";
+    Config.instance.requestIdName = "requestId_test";
+    Config.instance.traceIdName = "traceId_test";
+
     responseService =
       inversifyContainer().get<IResponseService>(ResponseService);
   });

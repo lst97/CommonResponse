@@ -1,5 +1,6 @@
 import { Config } from "../CommonResponse.config";
 import { ILogService, getLogService } from "../services/LogService";
+import { Config as ResponseConfig } from "@lst97/common-response-structure";
 
 jest.mock("pino", () => {
   return jest.fn().mockImplementation(() => {
@@ -17,7 +18,10 @@ describe("LogService", () => {
   let logService: ILogService;
 
   beforeEach(() => {
-    Config.instance.traceIdIdentifier = "mock_identifier_LogService";
+    Config.instance.idIdentifier = "mock_identifier_LogService";
+    Config.instance.requestIdName = "requestId_test";
+    Config.instance.traceIdName = "traceId_test";
+
     logService = getLogService();
   });
 

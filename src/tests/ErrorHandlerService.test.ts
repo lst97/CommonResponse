@@ -10,7 +10,10 @@ describe("ErrorHandlerService", () => {
   let errorHandlerService: IErrorHandlerService;
 
   beforeEach(() => {
-    Config.instance.traceIdIdentifier = "mock_identifier_ErrorHandlerService";
+    Config.instance.idIdentifier = "mock_identifier_ErrorHandlerService";
+    Config.instance.requestIdName = "requestId_test";
+    Config.instance.traceIdName = "traceId_test";
+
     errorHandlerService = ErrorHandlerServiceInstance();
   });
 

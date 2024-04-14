@@ -11,3 +11,4 @@ export {
 } from "./src/services/ErrorHandlerService";
 export * from "./src/models/Errors";
 export { Config } from "./src/CommonResponse.config";
+export { ResponseSchemas } from "@lst97/common-response-structure";
