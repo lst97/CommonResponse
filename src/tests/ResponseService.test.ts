@@ -1,8 +1,8 @@
 import { IResponseService, ResponseService } from "../services/ResponseService";
 import { ServerError } from "../models/Errors";
-import { BackendStandardResponse } from "../models/Response";
 import { inversifyContainer } from "../inversify.config";
 import { Config } from "../CommonResponse.config";
+import { IBackendStandardResponse } from "@lst97/common-response-structure";
 
 describe("ResponseService", () => {
   let responseService: IResponseService;
@@ -43,10 +43,10 @@ describe("ResponseService", () => {
         result: undefined,
         status: "error",
         timestamp: (
-          (response as any).response as BackendStandardResponse<undefined>
+          (response as any).response as IBackendStandardResponse<undefined>
         ).timestamp,
         traceId: (
-          (response as any).response as BackendStandardResponse<undefined>
+          (response as any).response as IBackendStandardResponse<undefined>
         ).traceId,
         version: "1.0",
         warnings: undefined,

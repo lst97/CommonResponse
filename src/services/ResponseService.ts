@@ -1,4 +1,3 @@
-import { BackendStandardResponse, ResponseMessage } from "../models/Response";
 import {
   ErrorHandlerService,
   IErrorHandlerService,
@@ -13,6 +12,10 @@ import {
 } from "../models/Errors";
 import { injectable } from "inversify";
 import { inversifyContainer } from "../inversify.config";
+import {
+  BackendStandardResponse,
+  ResponseMessage,
+} from "@lst97/common-response-structure";
 
 /**
  * The ResponseService class is responsible for building response objects based on provided errors,
