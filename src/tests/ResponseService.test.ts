@@ -1,5 +1,5 @@
 import { IResponseService, ResponseService } from "../services/ResponseService";
-import { ServerError } from "../models/Errors";
+import { ServerError } from "@lst97/common-errors";
 import { inversifyContainer } from "../inversify.config";
 import { Config } from "../CommonResponse.config";
 import { IBackendStandardResponse } from "@lst97/common-response-structure";

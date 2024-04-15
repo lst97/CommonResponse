@@ -4,14 +4,12 @@ import {
   IErrorHandlerService,
 } from "./services/ErrorHandlerService";
 import { IResponseService, ResponseService } from "./services/ResponseService";
-import { ILogService, LogService } from "./services/LogService";
 import {
-  IMessageCodeService,
-  MessageCodeService,
-} from "./services/MessageCodeService";
-import { DefinedBaseError } from "./models/Errors";
-import pino, { Logger } from "pino";
-
+  DefinedBaseError,
+  useInversify as useCommonErrorsInversify,
+} from "@lst97/common-errors";
+import { useInversify as useCommonServicesInversify } from "@lst97/common-services";
+import { Config } from "./CommonResponse.config";
 /**
  * For the user to get the singleton instance of the services,
  * Support to use the provided container to build the services.
@@ -21,21 +19,11 @@ import pino, { Logger } from "pino";
  */
 export class Containers {
   private static _instance: Containers;
-  private _idIdentifier: string;
   private container: Container;
 
   private constructor() {
     this.container = new Container();
     this.buildContainers();
-    this._idIdentifier = "unknown";
-  }
-
-  public set idIdentifier(value: string) {
-    this._idIdentifier = value;
-  }
-
-  public get idIdentifier() {
-    return this._idIdentifier;
   }
 
   public static get instance() {
@@ -51,68 +39,34 @@ export class Containers {
 
   private buildContainers() {
     this.buildConstantsContainer();
+    this.buildLibContainers();
     this.buildServiceContainer();
+  }
+
+  private buildLibContainers() {
+    useCommonServicesInversify(this.container);
+    useCommonErrorsInversify(this.container);
   }
 
   // Arguments that required for the services
   private buildConstantsContainer() {
-    // using pino for logging with pretty print by default
-    const logger = pino({
-      level: process.env.LOG_LEVEL || "info",
-      formatters: {
-        level: (label) => {
-          return { level: label };
-        },
-      },
-      transport: {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-          translateTime: "SYS:dd-mm-yyyy HH:MM:ss o",
-        },
-      },
-    });
-    this.container.bind<Logger<never>>("Logger").toConstantValue(logger);
-
-    // TODO: user can provide the values
-    // path to the message codes json file
-    this.container
-      .bind<string>("MessageCodesJsonPath")
-      .toConstantValue("src/models/MessageCodes.json");
-
     // error callback for ErrorHandlerService
+    if (this.container.isBound("ErrorCallback")) {
+      this.container.unbind("ErrorCallback");
+    }
     this.container
       .bind<(error: DefinedBaseError) => void>("ErrorCallback")
-      .toConstantValue((_error: DefinedBaseError) => {});
+      .toConstantValue(Config.instance.errorCallback);
   }
   private buildServiceContainer() {
-    try {
-      this.container.get<ILogService>(LogService);
-    } catch (e) {
-      this.container.bind<ILogService>(LogService).toSelf().inSingletonScope();
-    }
-
-    try {
-      this.container.get<IMessageCodeService>(MessageCodeService);
-    } catch (e) {
-      this.container
-        .bind<IMessageCodeService>(MessageCodeService)
-        .toSelf()
-        .inSingletonScope();
-    }
-
-    try {
-      this.container.get<IErrorHandlerService>(ErrorHandlerService);
-    } catch (e) {
+    if (!this.container.isBound(ErrorHandlerService)) {
       this.container
         .bind<IErrorHandlerService>(ErrorHandlerService)
         .toSelf()
         .inSingletonScope();
     }
 
-    try {
-      this.container.get<IResponseService>(ResponseService);
-    } catch (e) {
+    if (!this.container.isBound(ResponseService)) {
       this.container
         .bind<IResponseService>(ResponseService)
         .toSelf()

@@ -1,11 +1,11 @@
 import { Config } from "../CommonResponse.config";
-import { DefinedBaseError, ServerError, TestError } from "../models/Errors";
+import { DefinedBaseError, ServerError, TestError } from "@lst97/common-errors";
 import {
+  ErrorHandlerService,
   IErrorHandlerService,
   TestErrorLogStrategy,
-  ErrorHandlerServiceInstance,
 } from "../services/ErrorHandlerService";
-
+import { inversifyContainer } from "../inversify.config";
 describe("ErrorHandlerService", () => {
   let errorHandlerService: IErrorHandlerService;
 
@@ -14,7 +14,8 @@ describe("ErrorHandlerService", () => {
     Config.instance.requestIdName = "requestId_test";
     Config.instance.traceIdName = "traceId_test";
 
-    errorHandlerService = ErrorHandlerServiceInstance();
+    errorHandlerService =
+      inversifyContainer().get<IErrorHandlerService>(ErrorHandlerService);
   });
 
   afterEach(() => {

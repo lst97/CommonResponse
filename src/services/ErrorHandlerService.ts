@@ -7,11 +7,10 @@ import {
   ServerError,
   ServiceError,
   TestError,
-} from "../models/Errors";
-import { ILogService, LogService } from "./LogService";
+} from "@lst97/common-errors";
 import { Request } from "express";
 import { inversifyContainer } from "../inversify.config";
-import { Config } from "../CommonResponse.config";
+import { ILogService, LogService } from "@lst97/common-services";
 
 /**
  * The `ErrorHandlerService` class is responsible for handling and logging errors in a Node.js application.

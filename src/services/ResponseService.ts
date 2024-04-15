@@ -2,14 +2,15 @@ import {
   ErrorHandlerService,
   IErrorHandlerService,
 } from "../services/ErrorHandlerService";
-import { IMessageCodeService, MessageCodeService } from "./MessageCodeService";
 import {
   DefinedBaseError,
   DatabaseError,
   ServerError,
   SqlRecordExistsError,
   SqlRecordNotFoundError,
-} from "../models/Errors";
+  IMessageCodeService,
+  MessageCodeService,
+} from "@lst97/common-errors";
 import { injectable } from "inversify";
 import { inversifyContainer } from "../inversify.config";
 import {
